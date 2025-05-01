@@ -1,0 +1,86 @@
+/* category.css */
+
+/* Sidebar */
+.sidebar {
+    background-color: #343a40;
+    min-height: 100vh;
+    width: 250px;
+}
+
+.sidebar h3 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.sidebar .nav-link {
+    color: #cfd8dc;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #ffffff;
+    background-color: #495057;
+    border-radius: 5px;
+}
+
+/* Main Content */
+.container-fluid {
+    padding: 2rem;
+    margin-left: 250px; /* Make space for sidebar */
+}
+
+h1 {
+    margin-bottom: 2rem;
+}
+
+/* Form Styling */
+form {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 600px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form div {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0b5ed7;
+}
+
+a {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

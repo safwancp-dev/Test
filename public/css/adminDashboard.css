@@ -1,0 +1,64 @@
+/* Global Styles */
+body {
+  margin: 0;
+  background-color: #1e1e2f;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #343a40;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar h2 {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Sidebar Links */
+.nav-link {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  transition: background 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: #495057;
+}
+
+/* Main Content */
+.content {
+  margin-left: 250px;
+  padding: 2rem;
+  width: calc(100% - 250px);
+  color: white;
+}
+
+/* Cards */
+.card-stat {
+  border-radius: 10px;
+  background-color: #2d2d3a;
+  padding: 1rem;
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.card-stat:hover {
+  transform: scale(1.03);
+}

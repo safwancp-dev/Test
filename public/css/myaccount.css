@@ -1,0 +1,73 @@
+/* myaccount.css */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.panel {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 500px;
+}
+
+.panel-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #b30000; /* Darker red for title */
+    text-align: center;
+}
+
+.form-control {
+    border-radius: 5px;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    border-color: #b30000; /* Bootstrap red */
+    box-shadow: 0 0 5px rgba(220, 53, 69, 0.3);
+}
+
+.btn-primary {
+    background-color: #dc3545; /* Bootstrap red */
+    border-color: #dc3545;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #c82333; /* Darker red on hover */
+    border-color: #bd2130;
+}
+
+.btn-primary {
+    background-color: #b30000; /* Darker red */
+    border-color: #b30000;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #990000; /* Even darker on hover */
+    border-color: #800000;
+}
