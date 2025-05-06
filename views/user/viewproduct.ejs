@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> - Product Details</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  
+  <!-- HEADER -->
+  <%-include('partials/header') %>
+  <!-- /HEADER -->
+
+  <!-- PRODUCT DETAILS SECTION -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="<%= product.image %>" class="img-responsive" alt="<%= product.name %>">
+        </div>
+        <div class="col-md-6">
+          <h2><%= product.name %></h2>
+          <p><strong>Price:</strong> $<%= product.price %></p>
+          <p><strong>Category:</strong> <%= product.category.name %></p>
+          <p><%= product.description %></p>
+          <form action="/add-to-cart/<%= product._id %>" method="POST">
+            <button class="btn btn-success"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+          </form>
+          <% if (user) { %>
+            <% if (wishlistItems.includes(product._id.toString())) { %>
+              <form action="/wishlist/remove/<%= product._id %>" method="POST" style="display:inline;">
+                <button class="btn btn-danger"><i class="fa fa-heart"></i> Remove from Wishlist</button>
+              </form>
+            <% } else { %>
+              <form action="/wishlist/add/<%= product._id %>" method="POST" style="display:inline;">
+                <button class="btn btn-outline-danger"><i class="fa fa-heart-o"></i> Add to Wishlist</button>
+              </form>
+            <% } %>
+          <% } else { %>
+            <a href="/login" class="btn btn-outline-danger"><i class="fa fa-heart-o"></i> Login to add to Wishlist</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div id="bottom-footer" class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <ul class="footer-payments">
+              <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
+              <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
+              <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
+              <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
+            </ul>
+            <span class="copyright">
+              &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/main.js"></script>
+
+</body>
+</html>

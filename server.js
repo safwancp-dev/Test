@@ -6,7 +6,7 @@ const path=require('path')
 const cookieparser=require('cookie-parser')
 const userRouter=require('./routes/userroutes.js')
 const adminRouter=require('./routes/adminroutes.js')
-const userAuth=require('./middleware/userVerify.js')
+
 const app=express()
 
 app.use(nocache())
@@ -35,7 +35,6 @@ app.set('view engine', 'ejs'); // or the view engine you're using
 app.use('/',userRouter)
 app.use('/admin',adminRouter)
 
-app.use(userAuth)
 
 app.listen(process.env.PORT,()=>{
     console.log(`server started at http://localhost:${process.env.PORT}/home`)

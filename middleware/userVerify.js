@@ -1,29 +1,22 @@
-require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
+const authenticateUser = (req, res, next) => {
+  const token = req.cookies?.token; // Check if token is present in cookies
 
-
-const publicPaths = ["/home", "/shop", "/about", "/login", "/signup"];
-
-async function userAuth(req, res, next) {
-  const token = req.cookies.token;
+  if (!token) {
+    req.user = null;
+    return next(); // No token, proceed as unauthenticated
+  }
 
   try {
-    if (!token) {
-        console.log('unotharized user')
-      if (publicPaths.includes(req.path)) return next();
-      return res.redirect("/login");
-    }
-    const verifyUser = jwt.verify(token, process.env.JWT_SECRET);
-    // ✅ This sets req.user correctly as { id: userId }
-    req.user = verifyUser.user;
-    console.log("User from token:", req.user); // ✅ Debug output
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
+    req.user = decoded; // Attach decoded user data to req.user
     next();
-   
-  } catch (error) {
-    console.error("Auth error:", error.message);
-    res.status(500).send('server error',err)     
+  } catch (err) {
+    console.error("Token verification failed:", err.message);
+    req.user = null; // Treat as unauthenticated
+    next();
   }
-}
+};
 
-module.exports = userAuth;
+module.exports = authenticateUser;

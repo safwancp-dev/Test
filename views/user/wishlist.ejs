@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+
+    <!-- Bootstrap -->
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+
+    <!-- Slick -->
+    <link type="text/css" rel="stylesheet" href="/css/slick.css" />
+    <link type="text/css" rel="stylesheet" href="/css/slick-theme.css" />
+
+    <!-- nouislider -->
+    <link type="text/css" rel="stylesheet" href="/css/nouislider.min.css" />
+
+    <!-- Font Awesome Icon -->
+    <link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+    <!-- Custom stylesheet -->
+    <link type="text/css" rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <%- include('partials/header') %>
+    <!-- /HEADER -->
+
+    <!-- NAVIGATION BAR -->
+    <%- include('partials/navbar') %>
+    <!-- /NAVIGATION -->
+
+    <!-- WISHLIST PAGE SECTION -->
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h1>Your Wishlist</h1>
+
+            <% if (wishlist && wishlist.length > 0) { %>
+              <div class="row">
+                <% wishlist.forEach(product => { %>
+                  <div class="col-md-3 col-xs-6">
+                    <div class="product-card">
+                      <div class="product-image">
+                        <img src="<%= product.image %>" alt="<%= product.name %>" />
+                      </div>
+
+                      <div class="product-info">
+                        <h2><%= product.name %></h2>
+                        <p>Price: $<%= product.price %></p>
+                        <p>Category: <%= product.category.name %></p>
+                        <p><%= product.description %></p>
+                      </div>
+
+                      <!-- Remove from wishlist -->
+                      <div class="remove-from-wishlist">
+                        <form method="POST" action="/wishlist/remove/<%= product._id %>">
+                            <button type="submit" class="remove-btn" style="background-color: #a0001c; color: white; border: none; outline: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" onmouseover="this.style.backgroundColor='#b00020'" onmouseout="this.style.backgroundColor='#a0001c'">
+                                <i class="fa fa-trash"></i> Remove
+                              </button>
+                              
+                              
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <% if (typeof msg !== 'undefined' && msg) { %>
+                <p><%= msg %></p>
+              <% } else { %>
+                <p>Your wishlist is empty.</p>
+              <% } %>
+            <% } %>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div id="bottom-footer" class="section">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <ul class="footer-payments">
+                <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
+                <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
+                <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
+                <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
+              </ul>
+              <span class="copyright">
+                &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- /FOOTER -->
+
+    <!-- JS Scripts -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/slick.min.js"></script>
+    <script src="/js/nouislider.min.js"></script>
+    <script src="/js/jquery.zoom.min.js"></script>
+    <script src="/js/main.js"></script>
+  </body>
+</html>

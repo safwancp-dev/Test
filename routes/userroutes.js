@@ -1,13 +1,13 @@
 const express=require('express')
 const router=express.Router();
 const {renderhomepage,renderaboutpage,rendersignuppage,signup,renderotppage,verifyOtp, renderloginpage,login,logout,renderforgotpassword,handleforgotpassword,renderresetpassword,handleresetpassword,getuserAccount,updateUser}= require('../controllers/useraauth');
-const verify=require('../middleware/userVerify')
-const{getShopProducts}=require('../controllers/productController')
+const authenticateUser=require('../middleware/userVerify')
+const{getShopProducts,viewProductdetails}=require('../controllers/productController')
+const { addTwowishlist, removeFromwishlist, getWishlist}=require('../controllers/wishlistcontroller')
+const{addCart,getCartPage,updateQuantity}=require('../controllers/cartController')
 
-const{addCart}=require('../controllers/cartController')
-
-router.get('/home',renderhomepage)
-router.get('/about',renderaboutpage)
+router.get('/home',authenticateUser,renderhomepage)
+router.get('/about',authenticateUser,renderaboutpage)
 router.get('/login',renderloginpage)
 router.get('/signup',rendersignuppage)
 router.post('/signup',signup)
@@ -22,10 +22,15 @@ router.post('/logout',logout)
 router.get('/my-account',getuserAccount)
 router.post('/update-user',updateUser)
 
-router.get('/shop',getShopProducts)
+router.get('/shop',authenticateUser,getShopProducts)
+router.get('/product/:id',authenticateUser,viewProductdetails)
+router.get('/cart',authenticateUser,getCartPage)
+router.get('/wishlist',authenticateUser,getWishlist)
+router.post('/wishlist/add/:id',authenticateUser, addTwowishlist)
+router.post('/wishlist/remove/:id',authenticateUser,removeFromwishlist)
 
 
-
-router.post('/add-to-cart/:id',addCart)
+router.post('/update-cart/:id',authenticateUser,updateQuantity)
+router.post('/add-to-cart/:id',authenticateUser,addCart)
 
 module.exports=router;

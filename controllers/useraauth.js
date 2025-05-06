@@ -21,23 +21,17 @@ const transporter = nodemailer.createTransport({
   });
   
 
-const renderhomepage=async(req, res) => {
-    if (!req.user || !req.user.id) {
-        // ❌ ERROR FIXED: req.user was undefined, hence .id threw an error.
-        // ✅ Safe fallback for unauthenticated access
-        return res.render("user/home", { user: null, msg: "Welcome guest" });
-      }
-    const user = await User.findById(req.user.id);
-    // const user= await User.findOne(req.user.id)
-    res.render('user/home',{user});
+const renderhomepage=(req, res) => {
+    res.render('user/home',{user:req.user});
 }
 
 const renderaboutpage=(req,res)=>{
-    res.render('user/about')
+
+    res.render('user/about',{ user:req.user})
 }
 
 const renderloginpage=(req,res)=>{
-    res.render('user/login',{msg: null} )
+    res.render('user/login',{msg: null,successMsg:null} )
 }
 
 const rendersignuppage=(req,res)=>{
@@ -96,16 +90,10 @@ const signup=async(req,res)=>{
           } catch (emailError) {
             console.log('❌ Failed to send email:', emailError);
           }
-          // inside signup()
-const payload = { user: { id: newUser.id } }; // ✅ correct
-const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+          const token = jwt.sign({ userid: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+          // Send the JWT token as a cookie or in the response body
+          res.cookie('token', token, { httpOnly: true }); 
           
         console.log("user saved successfully")
         res.redirect(`/verify-otp/${newUser._id}`);
@@ -166,23 +154,17 @@ const login=async(req,res)=>{
 
         const user=await User.findOne({email})
         if(!user){
-           return res.render('user/login',{msg:"invalid credantails"})
+           return res.render('user/login',{msg:"invalid credantails",successMsg:null})
         }
         if(user.isBlocked){
-            return res.render('user/login',{msg:'your contact have been blocked. contact admin'})
+            return res.render('user/login',{successMsg:null,msg:'your contact have been blocked. contact admin'})
         }
-    const ismatch=await bcrypt.compare(password,user.password)
+    const ismatch= await bcrypt.compare(password,user.password)
         if(!ismatch){
-             return res.render('user/login',{msg: "Email or password invalid"})
+             return res.render('user/login',{msg: "Email or password invalid", successMsg: null})
         }
-        // inside login()
-const payload = { user: { id: user.id } }; // ✅ consistent structure
-const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
-res.cookie("token", token, {
-  httpOnly: true,
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
-
+        const token=jwt.sign({userid:user._id,email:user.email},process.env.JWT_SECRET,
+            {expiresIn:'1h'})//token expires in 1 hour
             console.log(token)
 
             if(!token){
@@ -192,7 +174,7 @@ res.cookie("token", token, {
 
 
             console.log("login succesfull")
-            res.render('user/home', { user,msg:'login successfull'}); 
+            res.render('user/home', { user,msg:null,successMsg:'login successfull'}); 
 
     }catch(err){
         res.status(500).send("error during login")
@@ -249,16 +231,16 @@ const handleresetpassword=async(req,res)=>{
     try{
         const {email,otp,password,confirmPassword}=req.body;
         if(password !==confirmPassword){
-            return res.render('user/resetpassword',{email,msg:"password do not match"})
+            return res.render('user/resetpassword',{email,successMsg:null,msg:"password do not match"})
         }
     const user=await User.findOne({email})
     if(!user){
-       return res.render('user/resetpassword',{email,msg:'user not found'})
+       return res.render('user/resetpassword',{email,successMsg:null,msg:'user not found'})
     }
     const enterotp=String(otp).trim()
     const saveotp=String(user.otp).trim()
     if(!user.otp||enterotp!==saveotp || Date.now() > user.otpExpiry){
-        return res.render('user/resetpassword',{email,msg:'invalid or expired otp'})
+        return res.render('user/resetpassword',{email,successMsg:null,msg:'invalid or expired otp'})
     }
   const hashedpassword=await bcrypt.hash(password,10)
   user.password=hashedpassword;
@@ -266,12 +248,12 @@ const handleresetpassword=async(req,res)=>{
   user.otpExpiry=null;
 
   await user.save()
-  res.render('user/login',{msg:'password reset successfull pleaselogin'})
+  res.render('user/login',{msg:null,successMsg:'password reset successfull pleaselogin'})
 
 
     }catch(err){
         console.log("error resetting password",err)
-        res.render('user/resetpassword',{  email: req.body.email || '', msg:'error resetting password please try again'})
+        res.render('user/resetpassword',{  email: req.body.email || '', msg:'error resetting password please try again',successMsg:null})
     }
 }
 const getuserAccount=async(req,res)=>{
@@ -282,8 +264,7 @@ const getuserAccount=async(req,res)=>{
         }
 
         const decoded=jwt.verify(token,process.env.JWT_SECRET)
-        const userId = decoded.user.id; // ✅ matches JWT structure
-
+        const userId=decoded.userid;
 
         const user=await User.findById(userId)
         if(!user){

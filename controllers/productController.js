@@ -1,8 +1,7 @@
 const Category=require('../model/categorySchema')
-const bcrypt=require('bcrypt')
+const jwt=require('jsonwebtoken');
 const Product=require('../model/productSchema')
-const User=require('../model/userSchema')
-
+const Wishlist=require('../model/wishlistSchema')
 const createCategory=async(req,res)=>{
     try{
         console.log('Rendering addcategory page');
@@ -74,7 +73,7 @@ const addProduct = async (req, res) => {
 const getproducts=async(req,res)=>{
     try{
         const products=await Product.find().populate('category')
-        const productCount =await Product.countDocuments()
+       
         res.render('admin/productManagement',{products}) // ✅ correct
 
 
@@ -144,13 +143,43 @@ const deleteproduct=async(req,res)=>{
 const getShopProducts=async(req,res)=>{
     try{
         const products=await Product.find().populate('category')
-         // ✅ Safe fallback for user
-    const user = req.user ? await User.findById(req.user.id) : null;
-        res.render('user/shop',{products,user})
+        
+        // Initialize wishlistItems as an empty array
+       let wishlistItems=[]
+        // If user is logged in, fetch the wishlist
+        if(req.user){
+            const wishlist=await Wishlist.findOne({user:req.user.userid}).populate('products')
+            if(wishlist){
+                wishlistItems=wishlist.products.map(product=>product._id.toString())
+            }
+        }
+        res.render('user/shop',{products,user:req.user,wishlistItems})
     }catch(err){
         console.log('error loading shop products',err)
         res.status(500).send('error laoding shop page')
     }
 }
 
-module.exports={createCategory,addCategory,getAddProduct,addProduct ,getproducts,deleteproduct,geteditproduct,updateproduct,getShopProducts}
+const viewProductdetails=async(req,res)=>{
+    try{
+        const productId=req.params.id
+        const product=await Product.findById(productId).populate('category')
+        if(!product){
+            return res.status(400).send('product not found')
+        }
+        let wishlistItems=[]
+        if(req.user){
+            const wishlist=await Wishlist.findOne({user:req.user.userid}).populate('products')
+            if(!wishlist){
+                wishlistItems=wishlist.products.map(product=>product>_id.toString())
+            }
+        }
+
+        res.render('user/viewproduct',{product,user:req.user||null,wishlistItems})
+    }catch(err){
+        console.log('error loading product details',err)
+         res.status(400).send('error loading view product page')
+    }
+}
+
+module.exports={createCategory,addCategory,getAddProduct,addProduct ,getproducts,deleteproduct,geteditproduct,updateproduct,getShopProducts,viewProductdetails}

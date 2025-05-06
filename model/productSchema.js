@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema({
     type: String, // This will store the path or URL of the uploaded image
     required: true,
 },                                              
-  isBlocked: { type: Boolean, default: false }                         
+  isBlocked: { type: Boolean, default: false }    ,                     
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

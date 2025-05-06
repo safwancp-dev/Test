@@ -10,7 +10,7 @@ const wishlistSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,ref:'Product',
         required:true,
         unique:true,
-    }]
+    }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Wishlist', wishlistSchema);

@@ -35,43 +35,78 @@
     <!-- /NAVIGATION -->
 
     <!-- SHOP PAGE SECTION -->
-	<div class="section">
-		<div class="container">
-		  <div class="row">
-			<div class="col-md-12">
-			  <h1>Shop Products</h1>
-			  <div class="row">
-				<% products.forEach(product => { %>
-          <div class="col-md-3 col-xs-6">
-          <div class="product-card">
-					  <div class="product-image">
-						<img src="<%= product.image %>" alt="<%= product.name %>">
-            <button class="wishlist-btn"><i class="fa fa-heart"></i></button>
+   
+    <!-- SHOP PAGE SECTION -->
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h1>Shop Products</h1>
+            <div class="row">
+              <% products.forEach(product => { %>
+                <div class="col-md-3 col-xs-6">
+                  <div class="product-card">
+                    <div class="product-image">
+                      <img src="<%= product.image %>" alt="<%= product.name %>" />
 
-					  </div>
-					  <div class="product-info">
-						<h2><%= product.name %></h2>
-            <p>Price: $<%= product.price %></p>
-						<p>Category: <%= product.category.name %></p>
-						<p><%= product.description %></p>
-						
-					  </div>
-					  <div class="add-to-cart">
-						  <form action="/add-to-cart/<%= product._id %>" method="POST">
-                <button type="submit" class="add-to-cart-btn">
-                  <i class="fa fa-shopping-cart"></i> Add to cart
-                </button>
-              </form>
-					  </div>
-					</div>
-				  </div>
-				<% }); %>
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	  
+                      <!-- Wishlist Button (Add or Remove) -->
+                      <% if (user) { %>
+                        <form method="POST" style="display:inline;">
+                          <% if (wishlistItems.includes(product._id.toString())) { %>
+                            <!-- Remove from wishlist -->
+                            <button 
+                              type="submit" 
+                              formaction="/wishlist/remove/<%= product._id %>" 
+                              class="wishlist-btn" 
+                              title="Remove from wishlist">
+                              <i class="fa fa-heart" style="color: red;"></i>
+                            </button>
+                          <% } else { %>
+                            <!-- Add to wishlist -->
+                            <button 
+                              type="submit" 
+                              formaction="/wishlist/add/<%= product._id %>" 
+                              class="wishlist-btn" 
+                              title="Add to wishlist">
+                              <i class="fa fa-heart-o"></i>
+                            </button>
+                          <% } %>
+                        </form>
+                      <% } else { %>
+                        <!-- Not logged in: Redirect to login -->
+                        <a href="/login" class="wishlist-btn" title="Login to add to wishlist">
+                          <i class="fa fa-heart-o"></i>
+                        </a>
+                      <% } %>
+                    </div>
+
+                    <div class="product-info">
+                      <h2><%= product.name %></h2>
+                      <p>Price: $<%= product.price %></p>
+                      <p>Category: <%= product.category.name %></p>
+                      <p><%= product.description %></p>
+                    </div>
+
+                    <div class="add-to-cart">
+                      <form action="/add-to-cart/<%= product._id %>" method="POST">
+                        <button type="submit" class="add-to-cart-btn">
+                          <i class="fa fa-shopping-cart"></i> Add to cart
+                        </button>
+                      </form>
+                      <!-- View Button -->
+                  <a href="/product/<%= product._id %>" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 5px;">
+                    <i class="fa fa-eye"></i> View
+                  </a>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 	  
     <!-- FOOTER -->
     <footer>
