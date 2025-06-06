@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet" />
+  <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/font-awesome.min.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+  <link type="text/css" rel="stylesheet" href="/css/style.css" />
+
+  <title>Available Offers</title>
+  <style>
+    /* Base and body */
+    body {
+      background: linear-gradient(135deg, #f0f4f8, #cfd8dc);
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding-bottom: 60px;
+      color: #37474f;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Container section */
+    .section {
+      padding: 60px 20px;
+      background: #fff;
+      max-width: 1080px;
+      margin: 60px auto;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Heading */
+    h2 {
+      font-weight: 700;
+      font-size: 2.6rem;
+      color: #263238;
+      text-align: center;
+      margin-bottom: 50px;
+      letter-spacing: 1.2px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Grid container for coupons */
+    .coupons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      width: 100%;
+    }
+
+    /* Coupon card */
+    .coupon-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      padding: 30px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: default;
+      user-select: none;
+    }
+
+    .coupon-card:hover,
+    .coupon-card:focus-within {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+      outline: none;
+    }
+
+    /* Coupon code block */
+    .coupon-code {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1565c0;
+      letter-spacing: 2px;
+      background: #e3f2fd;
+      padding: 12px 20px;
+      border-radius: 12px;
+      width: 100%;
+      text-align: center;
+      box-shadow: inset 0 1px 3px rgba(21, 101, 192, 0.3);
+      margin-bottom: 25px;
+      position: relative;
+      user-select: all;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Copy button */
+    .copy-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #1565c0;
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .copy-btn:hover {
+      background-color: #0d3c7f;
+    }
+
+    /* Coupon details */
+    .coupon-details p {
+      margin: 8px 0;
+      font-size: 1.1rem;
+      color: #455a64;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .coupon-details strong {
+      font-weight: 700;
+      color: #1e88e5;
+    }
+
+    /* No coupons message */
+    .no-coupons {
+      padding: 35px;
+      background-color: #f0f4f8;
+      border-radius: 14px;
+      color: #607d8b;
+      font-size: 1.3rem;
+      text-align: center;
+      max-width: 480px;
+      margin: 50px auto;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 767.98px) {
+      .section {
+        margin: 30px 15px;
+        padding: 40px 15px;
+      }
+
+      h2 {
+        font-size: 2.2rem;
+        margin-bottom: 35px;
+      }
+
+      .coupon-code {
+        font-size: 1.5rem;
+        padding: 10px 16px;
+        margin-bottom: 18px;
+      }
+
+      .coupon-details p {
+        font-size: 1rem;
+        margin: 6px 0;
+      }
+
+      .copy-btn {
+        padding: 5px 8px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('partials/header') %>
+  <%- include('partials/navbar') %>
+
+  <div class="section" role="main" aria-label="Available Offers">
+    <h2>✨ Discover Special Offers! ✨</h2>
+
+    <% if (coupons.length > 0) { %>
+      <div class="coupons-grid" role="list">
+        <% coupons.forEach(coupon => { %>
+          <article class="coupon-card" role="listitem" tabindex="0" aria-label="Coupon code <%= coupon.code %>">
+            <div class="coupon-code" id="code-<%= coupon._id %>">
+              <%= coupon.code %>
+              <button class="copy-btn" aria-label="Copy coupon code <%= coupon.code %>" data-clipboard-target="#code-<%= coupon._id %>">Copy</button>
+            </div>
+            <div class="coupon-details">
+              <p>Discount: <strong><%= coupon.discountValue %>%</strong></p>
+              <p>Minimum Purchase: ₹<strong><%= coupon.minAmount %></strong></p>
+              <p>Valid Until: <strong><%= coupon.expiryDate.toLocaleDateString() %></strong></p>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="no-coupons" role="alert" aria-live="polite">
+        <p>😞 Currently, there are no active offers available.</p>
+        <p>Please check back soon for new discounts!</p>
+      </div>
+    <% } %>
+  </div>
+
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <!-- Clipboard.js for copy button -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+  <script>
+    // Initialize Clipboard.js for copy buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      const clipboard = new ClipboardJS('.copy-btn');
+
+      clipboard.on('success', function (e) {
+        toastr.success('Coupon code copied!');
+        e.clearSelection();
+      });
+
+      clipboard.on('error', function (e) {
+        toastr.error('Failed to copy. Please copy manually.');
+      });
+    });
+  </script>
+</body>
+
+</html>

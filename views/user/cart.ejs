@@ -30,11 +30,9 @@
       .cart-section {
         padding: 60px 0;
       }
-
       .table th, .table td {
         vertical-align: middle !important;
       }
-
       .qty-btn {
         background: #D10024;
         color: #fff;
@@ -44,48 +42,40 @@
         cursor: pointer;
         border-radius: 4px;
       }
-
       .qty-btn:hover {
         background-color: #a0001c;
       }
-
       .qty-number {
         padding: 0 10px;
         font-weight: 600;
       }
-
       .total-amount {
         font-size: 18px;
         font-weight: bold;
         text-align: right;
         padding-top: 20px;
       }
-   
-  .custom-red {
-    background-color: #a0001c;
-    color: #fff;
-    padding: 10px 25px;
-    font-size: 16px;
-     border: none;
-     border-radius: 5px;
-     min-width: 180px;
-     text-decoration: none;
-     display: inline-block;
-     }
-
-  .custom-red:hover {
-  background-color: #870017;
-  color: #fff;
-  }
-
-  .cart-buttons .btn {
-    padding: 10px 25px;
-    font-size: 16px;
-   border-radius: 5px;
-   min-width: 180px;
-  }
-
-
+      .custom-red {
+        background-color: #a0001c;
+        color: #fff;
+        padding: 10px 25px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        min-width: 180px;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .custom-red:hover {
+        background-color: #870017;
+        color: #fff;
+      }
+      .cart-buttons .btn {
+        padding: 10px 25px;
+        font-size: 16px;
+        border-radius: 5px;
+        min-width: 180px;
+      }
       .empty-cart {
         text-align: center;
         font-size: 18px;
@@ -96,14 +86,11 @@
   </head>
   <body>
     <!-- HEADER -->
-    
-    <%-include('partials/header') %>
+    <%- include('partials/header') %>
 
     <!-- NAVIGATION -->
-   <%- include("partials/navbar") %>
+    <%- include('partials/navbar') %>
     <!-- /NAVIGATION -->
-  
-   
 
     <!-- CART SECTION -->
     <div class="section cart-section">
@@ -111,6 +98,7 @@
         <div class="row">
           <div class="col-md-12">
             <h2 class="text-center">Your Shopping Cart</h2>
+
             <% if (cart && cart.item.length > 0) { %>
               <div class="table-responsive">
                 <table class="table table-striped">
@@ -121,43 +109,52 @@
                       <th>Price</th>
                       <th>Quantity</th>
                       <th>Subtotal</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <% cart.item.forEach(item => { %>
-                      <tr>
+                      <tr id="row-<%= item.product._id %>">
                         <td>
-                          <img src="<%= item.product.image %>" alt="<%= item.product.name %>" style="width: 60px; height: auto;">
+                          <img src="<%= item.product.image[0] %>" alt="<%= item.product.name %>" style="width: 60px; height: auto;" />
                         </td>
                         <td><%= item.product.name %></td>
                         <td>₹<%= item.product.price %></td>
                         <td>
-                          <form action="/update-cart/<%= item.product._id %>" method="POST" style="display:inline;">
-                            <input type="hidden" name="action" value="decrement">
-                            <button type="submit" class="qty-btn">-</button>
-                          </form>
-                          <span class="qty-number"><%= item.quantity %></span>
-                          <form action="/update-cart/<%= item.product._id %>" method="POST" style="display:inline;">
-                            <input type="hidden" name="action" value="increment">
-                            <button type="submit" class="qty-btn">+</button>
+                          <button class="qty-btn" data-product-id="<%= item.product._id %>" data-action="decrement">-</button>
+                          <span class="qty-number" id="qty-<%= item.product._id %>"><%= item.quantity %></span>
+                          <button class="qty-btn" data-product-id="<%= item.product._id %>" data-action="increment">+</button>
+                        </td>
+                        <td id="subtotal-<%= item.product._id %>">
+                          ₹<%= item.product.price * item.quantity %>
+                        </td>
+                        <td>
+                          <!-- Remove button with normal POST form submit -->
+                          <form method="POST" action="/remove-cart/<%= item.product._id %>" onsubmit="return confirm('Are you sure you want to remove this item from the cart?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                           </form>
                         </td>
-                        <td>₹<%= item.product.price * item.quantity %></td>
                       </tr>
                     <% }) %>
                   </tbody>
                 </table>
               </div>
-              <div class="total-amount">
+
+              <div class="total-amount" id="total-amount">
                 Total: ₹<%= totalamount %>
-                <div class="cart-buttons text-center mt-4">
-                  <a href="/shop" class="btn custom-red mx-2">Continue Shopping</a>
-                  <a href="/checkout" class="btn btn-success mx-2">Go to Checkout</a>
-                </div>
-                
               </div>
+
+              <div class="cart-buttons text-center mt-4">
+                <a href="/shop" class="btn custom-red mx-2">Continue Shopping</a>
+                <a href="/checkout" class="btn btn-success mx-2">Go to Checkout</a>
+              </div>
+
             <% } else { %>
               <div class="empty-cart">Your cart is empty.</div>
+              <div class="cart-buttons text-center mt-4">
+                <a href="/shop" class="btn custom-red mx-2">Continue Shopping</a>
+                <a href="/checkout" class="btn btn-success mx-2">Go to Checkout</a>
+              </div>
             <% } %>
           </div>
         </div>
@@ -165,25 +162,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer>
-      <div id="bottom-footer" class="section">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12 text-center">
-              <ul class="footer-payments">
-                <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
-                <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
-                <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
-                <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
-              </ul>
-              <span class="copyright">
-                &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+   <%- include('partials/footer') %>
 
     <!-- JS Scripts -->
     <script src="/js/jquery.min.js"></script>
@@ -192,5 +171,62 @@
     <script src="/js/nouislider.min.js"></script>
     <script src="/js/jquery.zoom.min.js"></script>
     <script src="/js/main.js"></script>
+
+    <!-- AJAX for updating cart quantity -->
+    <script>
+      document.querySelectorAll('.qty-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const productId = button.getAttribute('data-product-id');
+          const action = button.getAttribute('data-action');
+
+          try {
+            const response = await fetch(`/update-cart/${productId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+              body: JSON.stringify({ action }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              if (data.removed) {
+                const row = document.getElementById(`row-${productId}`);
+                if (row) row.remove();
+
+                if (!document.querySelector('tbody tr')) {
+                  const tableContainer = document.querySelector('.table-responsive');
+                  const totalAmountDiv = document.getElementById('total-amount');
+
+                  if (tableContainer) tableContainer.style.display = 'none';
+                  if (totalAmountDiv) totalAmountDiv.style.display = 'none';
+
+                  const emptyMsg = document.createElement('div');
+                  emptyMsg.className = 'empty-cart';
+                  emptyMsg.textContent = 'Your cart is empty.';
+                  document.querySelector('.col-md-12').appendChild(emptyMsg);
+                }
+              } else {
+                document.getElementById(`qty-${productId}`).textContent = data.quantity;
+                document.getElementById(`subtotal-${productId}`).textContent = `₹${data.subtotal}`;
+              }
+
+              const totalAmountDiv = document.getElementById('total-amount');
+              if (totalAmountDiv) {
+                totalAmountDiv.textContent = `Total: ₹${data.totalAmount}`;
+              }
+            } else {
+              alert('Failed to update cart. Please try again.');
+            }
+          } catch (err) {
+            console.error('Error updating cart:', err);
+            alert('Server error. Please try again later.');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

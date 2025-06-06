@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Summary</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 900px;
+    }
+
+    .card {
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .table th, .table td {
+      vertical-align: middle;
+    }
+
+    .table thead {
+      background-color: #f1f3f5;
+    }
+
+    .grand-total {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #198754;
+    }
+
+    .btn-primary {
+      padding: 10px 25px;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    img.product-image {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 576px) {
+      .table-responsive {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container my-5">
+    <h2 class="text-center fw-bold mb-5">Order Summary</h2>
+
+    <!-- Customer Info -->
+    <div class="card p-4 mb-4">
+      <h4 class="mb-3">Customer Details</h4>
+      <div class="row">
+        <div class="col-md-6 mb-2">
+          <p><strong>Name:</strong> <%= order.shippingAddress.fullName %></p>
+          <p><strong>Email:</strong> <%= order.user.email %></p>
+          <p><strong>Phone:</strong> <%= order.shippingAddress.phone %></p>
+        </div>
+        <div class="col-md-6 mb-2">
+          <p><strong>Address:</strong><br>
+            <%= order.shippingAddress.address %>, 
+            <%= order.shippingAddress.city %> - 
+            <%= order.shippingAddress.postalCode %>
+          </p>
+          <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+          <p><strong>Payment Status:</strong> 
+            <span class="badge <%= order.paymentStatus === 'Paid' ? 'bg-success' : 'bg-warning text-dark' %>">
+              <%= order.paymentStatus %>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="card p-4 mb-4">
+      <h4 class="mb-3">Ordered Products</h4>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Image</th>
+              <th>Product Name</th>
+              <th class="text-center">Quantity</th>
+              <th class="text-end">Price (each)</th>
+              <th class="text-end">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% order.items.forEach(item => { %>
+              <tr>
+                <td class="text-center">
+                  <img src="<%= item.product.image[0] %>" alt="Product Image" class="product-image">
+                </td>
+                <td><%= item.product.name %></td>
+                <td class="text-center"><%= item.quantity %></td>
+                <td class="text-end">₹ <%= item.product.price.toFixed(2) %></td>
+                <td class="text-end">₹ <%= (item.product.price * item.quantity).toFixed(2) %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+          <tfoot>
+            <% if (order.discount > 0) { %>
+            <tr>
+              <th colspan="4" class="text-end">Discount Applied:</th>
+              <th class="text-end text-danger">- ₹ <%= order.discount.toFixed(2) %></th>
+            </tr>
+            <% } %>
+            <tr>
+              <th colspan="4" class="text-end">Grand Total:</th>
+              <th class="text-end grand-total">₹ <%= order.totalAmount.toFixed(2) %></th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Continue Shopping -->
+    <div class="text-center">
+      <a href="/shop" class="btn btn-primary">Continue Shopping</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

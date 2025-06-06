@@ -1,29 +1,38 @@
 {
   "name": "temp",
   "version": "1.0.0",
+  "description": "A Node.js Express server application",
   "main": "server.js",
   "scripts": {
-    "test": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "nodemon server.js"
   },
-  "author": "",
+  "author": "Your Name",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "body-parser": "^2.2.0",
+    "chart.js": "^4.4.9",
     "cloudinary": "^1.41.3",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.13.1",
+    "mongoose": "^8.14.1",
     "multer": "^1.4.5-lts.2",
     "multer-storage-cloudinary": "^4.0.0",
     "nocache": "^4.0.0",
     "nodemailer": "^6.10.0",
-    "nodemon": "^3.1.10",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "razorpay": "^2.9.6",
+    "stripe": "^18.1.0"
   },
-  "description": ""
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }

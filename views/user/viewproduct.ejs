@@ -1,78 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= product.name %> - Product Details</title>
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easyzoom@2.5.0/css/easyzoom.css" />
+
+  <style>
+    .product-detail-container { padding: 30px 0; }
+    .main-image-container {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+    .main-img {
+      width: 100%;
+      height: auto;
+      max-height: 450px;
+      object-fit: contain;
+      display: block;
+    }
+    .thumbnail-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-start;
+    }
+    .thumbnail-img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 1px solid #eee;
+      border-radius: 3px;
+      transition: border 0.2s ease;
+    }
+    .thumbnail-img:hover {
+      border-color: #007bff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .product-info h2 { margin-bottom: 10px; }
+    .product-info p strong { font-weight: 500; }
+    .price {
+      font-size: 1.5rem;
+      color: #28a745;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    .add-to-cart-btn {
+      font-size: 1.1rem;
+      padding: 10px 20px;
+      margin-bottom: 10px;
+    }
+    .wishlist-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 1rem;
+    }
+    .wishlist-btn.added {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-  
-  <!-- HEADER -->
-  <%-include('partials/header') %>
-  <!-- /HEADER -->
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
 
-  <!-- PRODUCT DETAILS SECTION -->
-  <div class="section">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <img src="<%= product.image %>" class="img-responsive" alt="<%= product.name %>">
+<div class="section product-detail-container">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-6">
+     <div class="mb-3 main-image-container easyzoom easyzoom--overlay">
+  <a href="<%= product.image[0] %>">
+    <img id="mainImage" src="<%= product.image[0] %>" class="img-fluid main-img" alt="<%= product.name %>">
+  </a>
+</div>
+  <div class="thumbnail-gallery">
+          <% product.image.forEach((img, index) => { %>
+            <img src="<%= img %>" class="thumbnail-img"
+                 onclick="document.getElementById('mainImage').src = this.src"
+                 alt="Thumbnail <%= index + 1 %>">
+          <% }) %>
         </div>
-        <div class="col-md-6">
-          <h2><%= product.name %></h2>
-          <p><strong>Price:</strong> $<%= product.price %></p>
-          <p><strong>Category:</strong> <%= product.category.name %></p>
-          <p><%= product.description %></p>
-          <form action="/add-to-cart/<%= product._id %>" method="POST">
-            <button class="btn btn-success"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
-          </form>
-          <% if (user) { %>
-            <% if (wishlistItems.includes(product._id.toString())) { %>
-              <form action="/wishlist/remove/<%= product._id %>" method="POST" style="display:inline;">
-                <button class="btn btn-danger"><i class="fa fa-heart"></i> Remove from Wishlist</button>
-              </form>
-            <% } else { %>
-              <form action="/wishlist/add/<%= product._id %>" method="POST" style="display:inline;">
-                <button class="btn btn-outline-danger"><i class="fa fa-heart-o"></i> Add to Wishlist</button>
-              </form>
-            <% } %>
-          <% } else { %>
-            <a href="/login" class="btn btn-outline-danger"><i class="fa fa-heart-o"></i> Login to add to Wishlist</a>
-          <% } %>
         </div>
+
+      
+      
+
+      <div class="col-md-6 product-info">
+        <h2><%= product.name %></h2>
+        <p class="price">$<%= product.price %></p>
+        <p><strong>Category:</strong> <%= product.category.name %></p>
+        <p><%= product.description %></p>
+
+        <% if(user) { %>
+          <button id="addCartBtn" class="btn btn-success add-to-cart-btn" data-product="<%= product._id %>">
+            <i class="fa fa-shopping-cart"></i> Add to Cart
+          </button>
+
+          <button id="wishlistBtn"
+                  class="wishlist-btn <%= wishlistItems.includes(product._id.toString()) ? 'added' : '' %>"
+                  data-product="<%= product._id %>"
+                  data-action="<%= wishlistItems.includes(product._id.toString()) ? 'remove' : 'add' %>">
+            <i class="fa <%= wishlistItems.includes(product._id.toString()) ? 'fa-heart' : 'fa-heart-o' %>"></i>
+            <span><%= wishlistItems.includes(product._id.toString()) ? 'Remove from Wishlist' : 'Add to Wishlist' %></span>
+          </button>
+        <% } else { %>
+          <button id="addCartBtn" class="btn btn-success add-to-cart-btn" data-product="<%= product._id %>">
+            <i class="fa fa-shopping-cart"></i> Add to Cart
+          </button>
+          <a href="/login" class="btn btn-outline-danger wishlist-btn">
+            <i class="fa fa-heart-o"></i> Add to Wishlist
+          </a>
+        <% } %>
+          
+      </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div id="bottom-footer" class="section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12 text-center">
-            <ul class="footer-payments">
-              <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
-              <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
-              <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
-              <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
-            </ul>
-            <span class="copyright">
-              &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/easyzoom@2.5.0/dist/easyzoom.js"></script>
 
-  <!-- JS Scripts -->
-  <script src="/js/jquery.min.js"></script>
-  <script src="/js/bootstrap.min.js"></script>
-  <script src="/js/main.js"></script>
+<script>
+  toastr.options = {
+    closeButton: true,
+    progressBar: true,
+    positionClass: "toast-top-right",
+    timeOut: "3000",
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const addCartBtn = document.getElementById('addCartBtn');
+    const wishlistBtn = document.getElementById('wishlistBtn');
+
+    if (addCartBtn) {
+      addCartBtn.addEventListener('click', async () => {
+        const productId = addCartBtn.dataset.product;
+        try {
+          const res = await fetch(`/add-to-cart/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await res.json();
+          if(data.success){
+            toastr.success(data.message || 'Added to cart!');
+            addCartBtn.disabled = true;
+            addCartBtn.innerHTML = '<i class="fa fa-check"></i> Added';
+          } else {
+            toastr.warning(data.message || 'Could not add to cart');
+          }
+        } catch (err) {
+          toastr.error('Error adding to cart');
+          console.error(err);
+        }
+      });
+    }
+
+    if (wishlistBtn) {
+      wishlistBtn.addEventListener('click', async () => {
+        const productId = wishlistBtn.dataset.product;
+        const action = wishlistBtn.dataset.action; // 'add' or 'remove'
+        try {
+          const res = await fetch(`/wishlist/${action}/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await res.json();
+
+          if(data.success){
+            if(action === 'add'){
+              wishlistBtn.dataset.action = 'remove';
+              wishlistBtn.classList.add('added');
+              wishlistBtn.innerHTML = '<i class="fa fa-heart"></i> Remove from Wishlist';
+              toastr.success(data.message || 'Added to wishlist');
+            } else {
+              wishlistBtn.dataset.action = 'add';
+              wishlistBtn.classList.remove('added');
+              wishlistBtn.innerHTML = '<i class="fa fa-heart-o"></i> Add to Wishlist';
+              toastr.success(data.message || 'Removed from wishlist');
+            }
+          } else {
+            toastr.warning(data.message || 'Wishlist action failed');
+          }
+        } catch(err){
+          toastr.error('Error updating wishlist');
+          console.error(err);
+        }
+      });
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const easyZoomInstance = $('.easyzoom').easyZoom();
+
+  // Thumbnail click updates main image and zoom source
+  document.querySelectorAll('.thumbnail-img').forEach((thumb) => {
+    thumb.addEventListener('click', function () {
+      const mainImage = document.getElementById('mainImage');
+      const newSrc = this.src;
+      const parentAnchor = mainImage.closest('a');
+      mainImage.src = newSrc;
+      parentAnchor.href = newSrc;
+
+      // Reinitialize zoom with new image
+      easyZoomInstance.data('easyZoom').swap(newSrc, newSrc);
+    });
+  });
+});
+
+</script>
+
 
 </body>
 </html>

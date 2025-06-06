@@ -1,24 +1,23 @@
-const jwt=require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const verify = (req, res, next) => {
-  const token = req.cookies?.token; // Check if token is present in cookies
+const adminVerify = (req, res, next) => {
+  const token = req.cookies["admintoken"]; // Check if token is present in cookies
 
   if (!token) {
-    req.admin= null;
-    
-    return res.redirect('/admin/adminlogin'); // No token, proceed as unauthenticated
+    req.admin = null;
+
+    return res.redirect("/admin/adminlogin"); // No token, proceed as unauthenticated
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
+    const decoded = jwt.verify(token, process.env.ADMIN_JWT); // Verify token
     req.admin = decoded; // Attach decoded user data to req.user
     next();
   } catch (err) {
     console.error("Token verification failed:", err.message);
-    req.admin= null; 
-    return res.redirect('/admin/adminlogin');
-
+    req.admin = null;
+    return res.redirect("/admin/adminlogin");
   }
 };
 
-module.exports=verify;
+module.exports = adminVerify;

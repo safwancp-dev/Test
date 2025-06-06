@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+
+  <!-- Bootstrap -->
+  <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+  <!-- Custom Style -->
+  <link type="text/css" rel="stylesheet" href="/css/style.css" />
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    .section {
+      padding: 40px 0;
+    }
+
+    h3.section-title {
+      font-weight: 700;
+      color: #343a40;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .order-card {
+      background-color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      padding: 25px;
+    }
+
+    .order-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .order-header {
+      border-bottom: 1px solid #e4e7ed;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .product-img {
+      max-width: 100px;
+      border-radius: 10px;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 50px;
+      font-size: 0.9em;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+
+    .badge-status.pending {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    .badge-status.delivered {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .badge-status.cancelled {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .cancel-btn {
+      background-color: #dc3545;
+      color: #fff;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      background-color: #c82333;
+    }
+
+    .cancel-btn:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .order-total {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .orders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .product-description {
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .order-item-divider {
+      border-top: 1px solid #e4e7ed;
+      margin: 15px 0;
+    }
+
+    @media (max-width: 768px) {
+      .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER + NAVBAR -->
+  <%- include('partials/header') %>
+  <%- include('partials/navbar') %>
+
+  <div class="section">
+    <div class="container">
+      <h3 class="text-center section-title">My Orders</h3>
+
+      <% if (orders.length === 0) { %>
+        <div class="text-center">
+          <p>No orders found.</p>
+          <a href="/shop" class="btn btn-primary">Shop Now</a>
+        </div>
+      <% } else { %>
+        <div class="orders-grid">
+          <% orders.forEach(order => { %>
+            <div class="order-card">
+              <div class="order-header">
+                <div>
+                  <strong>Order ID:</strong> <%= order._id %><br />
+                  <strong>Date:</strong> <%= order.createdAt.toLocaleDateString() %><br />
+                  <strong>Payment:</strong>
+                  <span class="<%= order.paymentStatus === 'Paid' ? 'text-success' : 'text-danger' %>">
+                    <%= order.paymentStatus %>
+                  </span>
+                </div>
+                <div>
+                  <span class="badge-status <%= order.status.toLowerCase() %>">
+                    <i class="fa <%= order.status === 'Delivered' ? 'fa-check-circle' : order.status === 'Cancelled' ? 'fa-times-circle' : 'fa-hourglass-half' %>"></i>
+                    <%= order.status %>
+                  </span>
+                </div>
+              </div>
+
+              <% order.items.forEach(item => { %>
+                <% if (item.product) { %>
+                  <div class="row align-items-center mb-3">
+                    <div class="col-md-3 col-4 text-center">
+                      <img src="<%= item.product.image?.[0] || '/images/default-product.jpg' %>" alt="Product Image" class="img-fluid product-img" />
+                    </div>
+                    <div class="col-md-6 col-8">
+                      <p class="product-name mb-1"><%= item.product.name %></p>
+                      <% if (item.product.description) { %>
+                        <p class="product-description mb-0"><%= item.product.description %></p>
+                      <% } %>
+                    </div>
+                    <div class="col-md-3 text-md-end text-start mt-2 mt-md-0">
+                      <p class="mb-1"><strong>Price:</strong> $<%= item.product.price %></p>
+                      <p class="mb-1"><strong>Qty:</strong> <%= item.quantity %></p>
+                      <p class="mb-0"><strong>Total:</strong> $<%= item.quantity * item.product.price %></p>
+                    </div>
+                  </div>
+                  <hr class="order-item-divider" />
+                <% } else { %>
+                  <div class="alert alert-warning">This product is no longer available.</div>
+                <% } %>
+              <% }) %>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <% if (order.status.toLowerCase() === 'pending') { %>
+                  <form action="/cancel-order/<%= order._id %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                    <button type="submit" class="cancel-btn">Cancel Order</button>
+                  </form>
+                <% } else if (order.status.toLowerCase() === 'cancelled') { %>
+                  <button class="cancel-btn" disabled>Cancelled</button>
+                <% } else { %>
+                  <span></span>
+                <% } %>
+                <div class="order-total">Grand Total: $<%= order.totalAmount %></div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/slick.min.js"></script>
+  <script src="/js/nouislider.min.js"></script>
+  <script src="/js/jquery.zoom.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+
+</html>

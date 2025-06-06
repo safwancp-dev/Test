@@ -1,280 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your E-commerce Store</title>
 
-  
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="/css/slick.css" />
+    <link type="text/css" rel="stylesheet" href="/css/slick-theme.css" />
+    <link type="text/css" rel="stylesheet" href="/css/nouislider.min.css" />
+    <link rel="stylesheet" href="/css/font-awesome.min.css" />
+    <link type="text/css" rel="stylesheet" href="/css/style.css" />
 
-    <!-- Google font -->
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+    <style>
+      /* Banner Carousel Enhancements */
+      .home-carousel {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .banner-item {
+        position: relative;
+        height: 400px;
+        color: #fff;
+      }
+      .banner-item img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        filter: brightness(0.7);
+        border-radius: 10px;
+      }
+      .banner-caption {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 700px;
+        text-align: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+      }
+      .primary-btn {
+        background: #ff6f61;
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: white;
+        border-radius: 30px;
+        transition: background 0.0s ease;
+        text-decoration: none;
+      }
+      .primary-btn:hover {
+        background: #ff3b2d;
+        text-decoration: none;
+        color: white;
+      }
 
-    <!-- Bootstrap -->
-    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css"/>
+      /* Slick Dots Custom */
+      .slick-dots {
+        bottom: 15px;
+      }
+      .slick-dots li button:before {
+        font-size: 12px;
+        color: #fff;
+        opacity: 0.75;
+      }
+      .slick-dots li.slick-active button:before {
+        color: #ff6f61;
+        opacity: 1;
+      }
 
-    <!-- Slick -->
-    <link type="text/css" rel="stylesheet" href="/css/slick.css"/>
-    <link type="text/css" rel="stylesheet" href="/css/slick-theme.css"/>
+      /* Slick Arrows */
+      .slick-arrow {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        z-index: 10;
+      }
+      .slick-arrow:before {
+        color: white;
+        font-size: 20px;
+      }
+      .slick-prev {
+        left: 15px;
+      }
+      .slick-next {
+        right: 15px;
+      }
 
-    <!-- nouislider -->
-    <link type="text/css" rel="stylesheet" href="/css/nouislider.min.css"/>
+      /* Responsive */
+      @media (max-width: 768px) {
+        .banner-item {
+          height: 250px;
+        }
+        .banner-item img {
+          height: 250px;
+        }
+        .banner-caption h3 {
+          font-size: 1.6rem;
+        }
+        .banner-caption p {
+          font-size: 1rem;
+        }
+        .primary-btn {
+          font-size: 1rem;
+          padding: 10px 20px;
+        }
+      }
+    </style>
+</head>
+<body>
 
-    <!-- Font Awesome Icon -->
-    <link rel="stylesheet" href="/css/font-awesome.min.css">
+  <%- include('partials/header') %>
+  <%- include('partials/navbar') %>
 
-    <!-- Custom stylesheet -->
-    <link type="text/css" rel="stylesheet" href="/css/style.css"/>
-
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <%-include('partials/header') %>
-
-    <!-- NAVIGATION -->
-   <%- include("partials/navbar") %>
-    <!-- /NAVIGATION -->
-
-
-
-
-
-
-
-    <!-- SECTION -->
-    <div class="section">
-      <div class="container">
-        <div class="row">
-          <!-- shop -->
-          <div class="col-md-4 col-xs-6">
-            <div class="shop">
-              <div class="shop-img">
-                <img src="/img/shop01.png" alt="">
-              </div>
-              <div class="shop-body">
-                <h3>MobilePhone<br>Collection</h3>
-                <a href="/shop" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
+  <!-- Banner Carousel Section -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="home-carousel">
+            <% if (banners && banners.length > 0) { %>
+              <% banners.forEach(banner => { %>
+                <% banner.imageUrls.forEach(image => { %>
+                  <div class="banner-item">
+                    <img src="<%= image %>" alt="Banner Image" />
+                    <div class="banner">
+                      <% if (banner.title) { %>
+                        <h3><%= banner.title %></h3>
+                      <% } %>
+                      <% if (banner.description) { %>
+                        <p><%= banner.description %></p>
+                      <% } %>
+                      <% if (banner.linkUrl) { %>
+                        <a href="<%= banner.linkUrl %>" class="primary-btn">Shop Now</a>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              <% }) %>
+            <% } else { %>
+              <p>No banners available.</p>
+            <% } %>
           </div>
-          <!-- /shop -->
-
-          <!-- shop -->
-          <div class="col-md-4 col-xs-6">
-            <div class="shop">
-              <div class="shop-img">
-                <img src="/img/shop03.png" alt="">
-              </div>
-              <div class="shop-body">
-                <h3>Mackbook<br>Collection</h3>
-                <a href="/shop" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-          </div>
-          <!-- /shop -->
-
-          <!-- shop -->
-          <div class="col-md-4 col-xs-6">
-            <div class="shop">
-              <div class="shop-img">
-                <img src="/img/shop02.png" alt="">
-              </div>
-              <div class="shop-body">
-                <h3>SmartWatch<br>Collection</h3>
-                <a href="/shop" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-          </div>
-          <!-- /shop -->
         </div>
       </div>
     </div>
-    <!-- /SECTION -->
+  </div>
 
-    <!-- SECTION: New Products -->
-    <!-- <div class="section">
-      <div class="container">
-        <div class="row">
-          <!-- section title -->
-          <!-- <div class="col-md-12">
-            <div class="section-title">
-              <h3 class="title">New Products</h3>
-              <div class="section-nav">
-                <ul class="section-tab-nav tab-nav">
-                  
-                </ul>
-              </div>
+  <!-- Shop Categories -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-xs-6">
+          <div class="shop">
+            <div class="shop-img">
+              <img src="/img/shop01.png" alt="" />
             </div>
-          </div>
-          <!-- /section title -->
-
-          <!-- Products tab & slick -->
-          <!-- <div class="col-md-12">
-            <div class="row">
-              <div class="products-tabs">
-                <!-- tab -->
-                <!-- <div id="tab1" class="tab-pane active">
-                  <div class="products-slick" data-nav="#slick-nav-1">
-                    <!-- product example -->
-                    <!-- <div class="product">
-                      <div class="product-img">
-                        <img src="/img/product01.png" alt="">
-                        <div class="product-label">
-                          <span class="sale">-30%</span>
-                          <span class="new">NEW</span>
-                        </div>
-                      </div>
-                      <div class="product-body">
-                        <p class="product-category">Category</p>
-                        <h3 class="product-name"><a href="#">product name goes here</a></h3>
-                        <h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-                        <div class="product-rating">
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                        </div>
-                        <div class="product-btns">
-                          <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-                          <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-                          <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-                        </div>
-                      </div>
-                      <div class="add-to-cart">
-                        <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                      </div>
-                    </div> --> 
-                    <!-- Repeat additional product blocks as needed -->
-                  <!-- </div>
-                  <div id="slick-nav-1" class="products-slick-nav"></div>
-                </div> -->
-                <!-- /tab -->
-              <!-- </div>
-            </div>
-          </div> -->
-          <!-- /Products tab & slick -->
-        <!-- </div>
-      </div> -->
-    <!-- </div> --> 
-    <!-- /SECTION -->
-
-    <!-- HOT DEAL SECTION
-    <div id="hot-deal" class="section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="hot-deal">
-              <ul class="hot-deal-countdown">
-                <li>
-                  <div>
-                    <h3>02</h3>
-                    <span>Days</span>
-                  </div>
-                </li>
-                <li>
-                  <div>
-                    <h3>10</h3>
-                    <span>Hours</span>
-                  </div>
-                </li>
-                <li>
-                  <div>
-                    <h3>34</h3>
-                    <span>Mins</span>
-                  </div>
-                </li>
-                <li>
-                  <div>
-                    <h3>60</h3>
-                    <span>Secs</span>
-                  </div>
-                </li>
-              </ul>
-              <h2 class="text-uppercase">hot deal this week</h2>
-              <p>New Collection Up to 50% OFF</p>
-              <a class="primary-btn cta-btn" href="#">Shop now</a>
+            <div class="shop-body">
+              <h3>MobilePhone<br />Collection</h3>
+              <a href="/shop" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
             </div>
           </div>
         </div>
-      </div>
-    </div> -->
-    <!-- /HOT DEAL SECTION -->
-
-    <!-- SECTION: Top Selling Widgets -->
-    <div class="section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 col-xs-6">
-            <div class="section-title">
-              <h4 class="title">Top selling</h4>
-              <div class="section-nav">
-                <div id="slick-nav-3" class="products-slick-nav"></div>
-              </div>
+        <div class="col-md-4 col-xs-6">
+          <div class="shop">
+            <div class="shop-img">
+              <img src="/img/shop03.png" alt="" />
             </div>
-            <div class="products-widget-slick" data-nav="#slick-nav-3">
-              <div>
-                <!-- product widget example -->
-                <div class="product-widget">
-                  <div class="product-img">
-                    <img src="/img/product01.png" alt="">
-                  </div>
-                  <div class="product-body">
-                    <p class="product-category">MobilePhone</p>
-                    <h3 class="product-name"><a href="#">iphone 16pro</a></h3>
-                    <h4 class="product-price">$100000 <del class="product-old-price"></del></h4>
-                  </div>
-                </div>
-                <!-- Repeat additional widget blocks as needed -->
-              </div>
-              <div>
-                <!-- additional widget group -->
-                <div class="product-widget">
-                  <div class="product-img">
-                    <img src="/img/product07.png" alt="">
-                  </div>
-                  <div class="product-body">
-                    <p class="product-category">Laptop</p>
-                    <h3 class="product-name"><a href="#">Mackbook pro</a></h3>
-                    <h4 class="product-price">$100000<del class="product-old-price"></del></h4>
-                  </div>
-                </div>
-              </div>
+            <div class="shop-body">
+              <h3>MacBook<br />Collection</h3>
+              <a href="/shop" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
             </div>
           </div>
-
-          <div class="col-md-4 col-xs-6">
-            <div class="section-title">
-              <h4 class="title"></h4>
-              <div class="section-nav">
-                <div id="slick-nav-4" class="products-slick-nav"></div>
-              </div>
+        </div>
+        <div class="col-md-4 col-xs-6">
+          <div class="shop">
+            <div class="shop-img">
+              <img src="/img/shop02.png" alt="" />
             </div>
-            <div class="products-widget-slick" data-nav="#slick-nav-4">
-              <div>
-                <!-- product widget blocks can be repeated here -->
-                <!-- ... -->
-              </div>
+            <div class="shop-body">
+              <h3>SmartWatch<br />Collection</h3>
+              <a href="/shop" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- /SECTION -->
+  </div>
 
-    <!-- Include your JS files -->
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/slick.min.js"></script>
-    <script src="/js/nouislider.min.js"></script>
-    <script src="/js/jquery.zoom.min.js"></script>
-    <script src="/js/main.js"></script>
-    
-    
-    
-  </body>
+  <!-- Top Selling Section -->
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-xs-6">
+          <div class="section-title">
+            <h4 class="title">Top Selling</h4>
+            <div class="section-nav">
+              <div id="slick-nav-3" class="products-slick-nav"></div>
+            </div>
+          </div>
+          <div class="products-widget-slick" data-nav="#slick-nav-3">
+            <div>
+              <div class="product-widget">
+                <div class="product-img">
+                  <img src="/img/product01.png" alt="" />
+                </div>
+                <div class="product-body">
+                  <p class="product-category">MobilePhone</p>
+                  <h3 class="product-name"><a href="/shop">iPhone 16 Pro</a></h3>
+                  <h4 class="product-price">$100000</h4>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="product-widget">
+                <div class="product-img">
+                  <img src="/img/product07.png" alt="" />
+                </div>
+                <div class="product-body">
+                  <p class="product-category">Laptop</p>
+                  <h3 class="product-name"><a href="/shop">MacBook Pro</a></h3>
+                  <h4 class="product-price">$100000</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional sections can go here -->
+
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+  <!-- JS Scripts -->
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/slick.min.js"></script>
+  <script src="/js/nouislider.min.js"></script>
+  <script src="/js/jquery.zoom.min.js"></script>
+  <script src="/js/main.js"></script>
+
+  <!-- Slick Carousel Script -->
+  <script>
+    $(document).ready(function () {
+      $('.home-carousel').slick({
+        autoplay: true,
+        autoplaySpeed: 4000,       // Slide changes every 4 seconds
+        speed: 1000,               // Slide transition animation speed (1 second)
+        fade: true,                // Fade effect
+        cssEase: 'linear',         // Linear easing for smooth fade
+        dots: true,
+        arrows: true,
+        infinite: true,
+        pauseOnHover: true,
+        pauseOnFocus: true,
+        adaptiveHeight: true
+      });
+    });
+  </script>
+</body>
 </html>

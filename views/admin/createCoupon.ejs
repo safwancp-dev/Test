@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Coupons</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Custom Admin CSS -->
+  <link rel="stylesheet" href="/css/adminDashboard.css" />
+</head>
+<body class="d-flex flex-column flex-md-row min-vh-100 bg-dark">
+
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content -->
+  <div class="content flex-grow-1 p-4">
+    <h4 class="text-white mb-4">Manage Coupons</h4>
+
+    <!-- Add Coupon Form -->
+    <div class="card bg-secondary text-white mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Add New Coupon</h5>
+      </div>
+      <div class="card-body">
+        <form action="/admin/addCoupon" method="POST" class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Coupon Code</label>
+            <input type="text" name="code" class="form-control" required />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Discount Type</label>
+            <select name="discountType" class="form-select" required>
+              <option value="percentage">Percentage</option>
+              <option value="fixed">Fixed</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Discount Value</label>
+            <input type="number" name="discountValue" class="form-control" required />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Min Purchase (₹)</label>
+            <input type="number" name="minPurchaseAmount" class="form-control" required />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Expiry Date</label>
+            <input type="date" name="expiryDate" class="form-control" required />
+          </div>
+          <div class="col-md-12 text-end">
+            <button type="submit" class="btn btn-light mt-3">Add Coupon</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Coupon List -->
+    <div class="card bg-secondary text-white">
+      <div class="card-header">
+        <h5 class="mb-0">All Coupons</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-dark table-striped mb-0">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Min Purchase</th>
+              <th>Expiry</th>
+              <th>Used By</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (coupons.length === 0) { %>
+              <tr>
+                <td colspan="7" class="text-center">No coupons found</td>
+              </tr>
+            <% } else { %>
+              <% coupons.forEach(coupon => { %>
+                <tr>
+                  <td><%= coupon.code %></td>
+                  <td><%= coupon.discountType %></td>
+                  <td><%= coupon.discountValue %></td>
+                  <td>₹<%= coupon.minPurchaseAmount %></td>
+                  <td><%= coupon.expiryDate.toDateString() %></td>
+                  <td><%= coupon.usedBy.length %></td>
+                  <td>
+                    <form action="/admin/deleteCoupons/<%= coupon._id %>" method="POST" onsubmit="return confirm('Delete this coupon?')">
+                      <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

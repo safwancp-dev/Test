@@ -13,6 +13,9 @@
   
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/css/adminDashboard.css" />
+
+  <!-- Google Charts Loader -->
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body class="d-flex flex-column flex-md-row min-vh-100 bg-dark">
 
@@ -21,7 +24,6 @@
 
   <!-- Main Content -->
   <div class="content flex-grow-1 p-4">
-
     <h4 class="text-white mb-4">Welcome to Admin</h4>
 
     <div class="row g-4">
@@ -40,8 +42,7 @@
         <div class="card card-stat bg-secondary text-white h-100">
           <div class="card-body text-center">
             <h6>Total Users</h6>
-            <h3><%= userCount%></h3>
-           
+            <h3><%= userCount %></h3>
           </div>
         </div>
       </div>
@@ -57,13 +58,12 @@
         </div>
       </div>
 
-      <!-- Recent Orders -->
+      <!-- Total Orders -->
       <div class="col-12 col-sm-6 col-lg-3">
         <div class="card card-stat bg-secondary text-white h-100">
           <div class="card-body text-center">
-            <h6>Recent Orders</h6>
-            <h3>0</h3>
-            <p class="mb-0">No recent orders placed.</p>
+            <h6>Total Orders</h6>
+            <h3><%= orderCount %></h3>
           </div>
         </div>
       </div>
@@ -73,20 +73,117 @@
     <div class="card bg-secondary text-white mt-4">
       <div class="card-body">
         <h5 class="card-title text-center mb-4">Business Overview</h5>
-        <canvas id="businessChart" height="120"></canvas>
+    <div id="chart-div" style="width: 700px; height: 250px;"></div>
+
       </div>
     </div>
-
   </div>
 
-  <!-- Bootstrap Bundle with Popper -->
+   <script src='https://www.gstatic.com/charts/loader.js'></script>
+    <script>
+  google.charts.load('upcoming', {'packages': ['vegachart']}).then(drawChart);
+
+  function drawChart() {
+    const monthlyRevenue = <%- JSON.stringify(monthlyRevenue) %>;
+
+    const dataTable = new google.visualization.DataTable();
+    dataTable.addColumn({type: 'string', id: 'category'});
+    dataTable.addColumn({type: 'number', id: 'amount'});
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const rows = months.map((month, index) => [month, monthlyRevenue[index]]);
+    dataTable.addRows(rows);
+
+    const options = {
+      "vega": {
+        "$schema": "https://vega.github.io/schema/vega/v4.json",
+        "width": 500,
+        "height": 200,
+        "padding": 5,
+        "data": [{ "name": "table", "source": "datatable" }],
+        "signals": [
+          {
+            "name": "tooltip",
+            "value": {},
+            "on": [
+              {"events": "rect:mouseover", "update": "datum"},
+              {"events": "rect:mouseout", "update": "{}"}
+            ]
+          }
+        ],
+        "scales": [
+          {
+            "name": "xscale",
+            "type": "band",
+            "domain": {"data": "table", "field": "category"},
+            "range": "width",
+            "padding": 0.05,
+            "round": true
+          },
+          {
+            "name": "yscale",
+            "domain": {"data": "table", "field": "amount"},
+            "nice": true,
+            "range": "height"
+          }
+        ],
+        "axes": [
+          { "orient": "bottom", "scale": "xscale" },
+          { "orient": "left", "scale": "yscale" }
+        ],
+        "marks": [
+          {
+            "type": "rect",
+            "from": { "data": "table" },
+            "encode": {
+              "enter": {
+                "x": {"scale": "xscale", "field": "category"},
+                "width": {"scale": "xscale", "band": 1},
+                "y": {"scale": "yscale", "field": "amount"},
+                "y2": {"scale": "yscale", "value": 0}
+              },
+              "update": {
+                "fill": {"value": "steelblue"}
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }
+            }
+          },
+          {
+            "type": "text",
+            "encode": {
+              "enter": {
+                "align": {"value": "center"},
+                "baseline": {"value": "bottom"},
+                "fill": {"value": "#fff"}
+              },
+              "update": {
+                "x": {"scale": "xscale", "signal": "tooltip.category", "band": 0.5},
+                "y": {"scale": "yscale", "signal": "tooltip.amount", "offset": -2},
+                "text": {"signal": "tooltip.amount"},
+                "fillOpacity": [
+                  {"test": "datum === tooltip", "value": 0},
+                  {"value": 1}
+                ]
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    const chart = new google.visualization.VegaChart(document.getElementById('chart-div'));
+    chart.draw(dataTable, options);
+  }
+</script>
+
+
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Your custom JS -->
-  <script src="/js/chart.js"></script>
 
 </body>
 </html>

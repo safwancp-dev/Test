@@ -1,18 +1,22 @@
-
-
-
 <nav id="navigation">
-    <div class="container">
-      <div id="responsive-nav">
-        <!-- NAV -->
-        <ul class="main-nav nav navbar-nav">
-          <li class="active"><a href="/home">Home</a></li>
-          <li><a href="/shop">Shop</a></li>
-          <!-- <li><a href="#">Categories</a></li> -->
-          <li><a href="/about">About</a></li>
-          <li><a href="#">Contact Us</a></li>
-        </ul>
-        <!-- /NAV -->
-      </div>
+  <div class="container">
+    <div id="responsive-nav">
+      <!-- NAV -->
+      <ul class="main-nav nav navbar-nav">
+        <li class="active"><a href="/home">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/offers">offers</a></li>
+        <li><a href="/contact-us">Contact Us</a></li>
+
+        
+
+        
+        <% if (user) { %>
+          <li><a href="/view-orders">Orders</a></li>
+        <% } %>
+      </ul>
+      <!-- /NAV -->
     </div>
-  </nav>
+  </div>
+</nav>

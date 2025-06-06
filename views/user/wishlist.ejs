@@ -1,117 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Google font -->
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+  <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/font-awesome.min.css" />
+  <link type="text/css" rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
-    <!-- Bootstrap -->
-    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+  <style>
+    /* (Your existing styles unchanged) */
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .wishlist-container {
+      max-height: 600px;
+      overflow-y: auto;
+      padding: 40px 20px;
+      margin: 0 auto;
+      max-width: 1200px;
+      box-sizing: border-box;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .wishlist-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .wishlist-container::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    .wishlist-container::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    .wishlist-title {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.6em;
+      font-weight: 700;
+      color: #343a40;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #e9ecef;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      border-color: #007bff;
+    }
+    .product-image-container {
+      padding: 5px;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid #e9ecef;
+      flex-shrink: 0;
+    }
+    .product-image {
+      max-height: 200px;
+      max-width: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      display: block;
+    }
+    .product-image:hover {
+      transform: scale(1.05);
+    }
+    .product-info {
+      padding: 20px;
+      text-align: center;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .product-name {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: #343a40;
+      text-decoration: none;
+      margin-bottom: 12px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .product-price {
+      color: #dc3545;
+      font-weight: 700;
+      font-size: 1.15em;
+      margin-bottom: 8px;
+    }
+    .product-category {
+      font-size: 0.9em;
+      color: #6c757d;
+      margin-bottom: 10px;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-around;
+      padding: 15px;
+      border-top: 1px solid #e9ecef;
+      background-color: #f8f9fa;
+      border-radius: 0 0 8px 8px;
+      flex-shrink: 0;
+    }
+    .add-btn, .remove-btn {
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .add-btn {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .add-btn:hover {
+      background-color: #1e7e34;
+    }
+    .remove-btn {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .remove-btn:hover {
+      background-color: #c82333;
+    }
+    .empty-wishlist {
+      text-align: center;
+      padding: 80px 20px;
+      font-size: 1.2em;
+      color: #6c757d;
+    }
+    .empty-wishlist p {
+      margin-bottom: 25px;
+    }
+    .continue-shopping-btn {
+      display: inline-block;
+      padding: 12px 26px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1em;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+    .continue-shopping-btn:hover {
+      background-color: #0056b3;
+    }
+    @media (max-width: 767px) {
+      .wishlist-container {
+        padding: 30px 15px;
+        max-height: none;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .product-card {
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+  <%- include('partials/navbar') %>
 
-    <!-- Slick -->
-    <link type="text/css" rel="stylesheet" href="/css/slick.css" />
-    <link type="text/css" rel="stylesheet" href="/css/slick-theme.css" />
+  <div class="section">
+    <div class="container wishlist-container">
+      <h1 class="wishlist-title">Your Wishlist</h1>
 
-    <!-- nouislider -->
-    <link type="text/css" rel="stylesheet" href="/css/nouislider.min.css" />
-
-    <!-- Font Awesome Icon -->
-    <link rel="stylesheet" href="/css/font-awesome.min.css" />
-
-    <!-- Custom stylesheet -->
-    <link type="text/css" rel="stylesheet" href="/css/style.css" />
-  </head>
-
-  <body>
-    <!-- HEADER -->
-    <%- include('partials/header') %>
-    <!-- /HEADER -->
-
-    <!-- NAVIGATION BAR -->
-    <%- include('partials/navbar') %>
-    <!-- /NAVIGATION -->
-
-    <!-- WISHLIST PAGE SECTION -->
-    <div class="section">
-      <div class="container">
+      <% if (wishlist && wishlist.length > 0) { %>
         <div class="row">
-          <div class="col-md-12">
-            <h1>Your Wishlist</h1>
-
-            <% if (wishlist && wishlist.length > 0) { %>
-              <div class="row">
-                <% wishlist.forEach(product => { %>
-                  <div class="col-md-3 col-xs-6">
-                    <div class="product-card">
-                      <div class="product-image">
-                        <img src="<%= product.image %>" alt="<%= product.name %>" />
-                      </div>
-
-                      <div class="product-info">
-                        <h2><%= product.name %></h2>
-                        <p>Price: $<%= product.price %></p>
-                        <p>Category: <%= product.category.name %></p>
-                        <p><%= product.description %></p>
-                      </div>
-
-                      <!-- Remove from wishlist -->
-                      <div class="remove-from-wishlist">
-                        <form method="POST" action="/wishlist/remove/<%= product._id %>">
-                            <button type="submit" class="remove-btn" style="background-color: #a0001c; color: white; border: none; outline: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" onmouseover="this.style.backgroundColor='#b00020'" onmouseout="this.style.backgroundColor='#a0001c'">
-                                <i class="fa fa-trash"></i> Remove
-                              </button>
-                              
-                              
-                        </form>
-                      </div>
-                    </div>
+          <% wishlist.forEach(product => { %>
+            <% if (product) { %>
+              <div class="col-lg-4 col-md-6 col-sm-12 d-flex">
+                <div class="product-card d-flex flex-direction-center ">
+                  <div class="product-image-container">
+                    <a href="/product/<%= product._id %>">
+                      <img src="<%= product.image?.[0] || '/images/default-product.jpg' %>" alt="<%= product.name || 'Unnamed Product' %>" class="product-image" />
+                    </a>
                   </div>
-                <% }) %>
+
+                  <div class="product-info">
+                    <a href="/product/<%= product._id %>" class="product-name"><%= product.name || 'Unnamed Product' %></a>
+                    <p class="product-price">$<%= product.price || 'N/A' %></p>
+                    <% if (product.category && product.category.name) { %>
+                      <p class="product-category"><%= product.category.name %></p>
+                    <% } %>
+                  </div>
+
+                  <div class="actions">
+                    <!-- Add to Cart AJAX button -->
+                    <button class="add-btn add-to-cart-btn" data-id="<%= product._id %>">
+                      <i class="fa fa-shopping-cart"></i> Add to Cart
+                    </button>
+
+                    <!-- Remove from Wishlist AJAX button -->
+                    <button class="remove-btn remove-from-wishlist-btn" data-id="<%= product._id %>">
+                      <i class="fa fa-trash"></i> Remove
+                    </button>
+                  </div>
+                </div>
               </div>
             <% } else { %>
-              <% if (typeof msg !== 'undefined' && msg) { %>
-                <p><%= msg %></p>
-              <% } else { %>
-                <p>Your wishlist is empty.</p>
-              <% } %>
+              <p class="text-danger">Product not found.</p>
             <% } %>
-
-          </div>
+          <% }) %>
         </div>
-      </div>
+      <% } else { %>
+        <div class="empty-wishlist">
+          <% if (typeof msg !== 'undefined' && msg) { %>
+            <p><%= msg %></p>
+          <% } else { %>
+            <p>Your wishlist is empty.</p>
+            <a href="/shop" class="continue-shopping-btn">Continue Shopping</a>
+          <% } %>
+        </div>
+      <% } %>
     </div>
+  </div>
 
-    <!-- FOOTER -->
-    <footer>
-      <div id="bottom-footer" class="section">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12 text-center">
-              <ul class="footer-payments">
-                <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
-                <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
-                <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
-                <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
-              </ul>
-              <span class="copyright">
-                &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-    <!-- /FOOTER -->
+  <%- include('partials/footer') %>
 
-    <!-- JS Scripts -->
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/slick.min.js"></script>
-    <script src="/js/nouislider.min.js"></script>
-    <script src="/js/jquery.zoom.min.js"></script>
-    <script src="/js/main.js"></script>
-  </body>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/slick.min.js"></script>
+  <script src="/js/nouislider.min.js"></script>
+  <script src="/js/jquery.zoom.min.js"></script>
+  <script src="/js/main.js"></script>
+
+  <!-- toastr -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      toastr.options = {
+        closeButton: false,
+        debug: false,
+        newestOnTop: false,
+        progressBar: true,
+        positionClass: "toast-top-right",
+        preventDuplicates: false,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        timeOut: "4000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut"
+      };
+
+      // Add to Cart button click handler
+      $('.add-to-cart-btn').on('click', function() {
+        const productId = $(this).data('id');
+        $.ajax({
+          url: `/add-to-cart/${productId}`,
+          method: 'POST',
+          success: function(res) {
+            if (res.success) {
+              toastr.success(res.message || 'Item added to cart');
+            } else {
+              toastr.error(res.message || 'Failed to add to cart');
+            }
+          },
+          error: function(xhr) {
+            let errMsg = 'Error adding to cart';
+            if(xhr.responseJSON && xhr.responseJSON.message){
+              errMsg = xhr.responseJSON.message;
+            }
+            toastr.error(errMsg);
+          }
+        });
+      });
+
+      // Remove from Wishlist button click handler
+      $('.remove-from-wishlist-btn').on('click', function() {
+        const productId = $(this).data('id');
+        const productCard = $(this).closest('.col-lg-4, .col-md-6, .col-sm-12');
+
+        $.ajax({
+          url: `/wishlist/remove/${productId}`,
+          method: 'POST',
+          success: function(res) {
+            if (res.success) {
+              toastr.success(res.message || 'Removed from wishlist');
+              // Remove the product card from UI smoothly
+              productCard.fadeOut(400, function() {
+                $(this).remove();
+
+                // If no more products left, show empty message
+                if ($('.product-card').length === 0) {
+                  $('.wishlist-container .row').remove();
+                  $('.wishlist-container').append(`
+                    <div class="empty-wishlist">
+                      <p>Your wishlist is empty.</p>
+                      <a href="/shop" class="continue-shopping-btn">Continue Shopping</a>
+                    </div>
+                  `);
+                }
+              });
+            } else {
+              toastr.error(res.message || 'Failed to remove from wishlist');
+            }
+          },
+          error: function(xhr) {
+            let errMsg = 'Error removing from wishlist';
+            if(xhr.responseJSON && xhr.responseJSON.message){
+              errMsg = xhr.responseJSON.message;
+            }
+            toastr.error(errMsg);
+          }
+        });
+      });
+    });
+  </script>
+</body>
 </html>

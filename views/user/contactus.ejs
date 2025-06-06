@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us - Apz Store</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css"/>
+  <link type="text/css" rel="stylesheet" href="/css/slick.css"/>
+  <link type="text/css" rel="stylesheet" href="/css/slick-theme.css"/>
+  <link type="text/css" rel="stylesheet" href="/css/nouislider.min.css"/>
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+  <link type="text/css" rel="stylesheet" href="/css/style.css"/>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+    }
+
+    .section {
+      padding: 60px 0;
+    }
+
+    .about-section,
+    .section-box {
+      background-color: #fff;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 40px;
+    }
+
+    .about-section h2,
+    .section-title {
+      text-align: center;
+      font-weight: 700;
+      font-size: 32px;
+      color: #121314;
+      margin-bottom: 20px;
+    }
+
+    .about-section p,
+    .about-section ul {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #444;
+      text-align: center;
+    }
+
+    .about-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .about-section li::before {
+      content: "✓";
+      margin-right: 8px;
+      color: #28a745;
+    }
+
+    .contact-info ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .contact-info li {
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .contact-info i {
+      margin-right: 10px;
+      color: #030405;
+    }
+
+    label {
+      font-weight: 500;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background-color: #a80202;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0d0e0f;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER + NAV -->
+  <%- include("partials/header") %>
+  <%- include("partials/navbar") %>
+
+  <!-- MAIN SECTION -->
+  <div class="section">
+    <div class="container">
+
+      <!-- About -->
+      <div class="about-section">
+        <h2>About Apz Store</h2>
+        <p>Welcome to Apz Store – your trusted destination for genuine Apple products.</p>
+        <p>We specialize in delivering the latest and most premium Apple devices including iPhones, MacBooks, iPads, and accessories.</p>
+        <ul>
+          <li>Wide range of authentic Apple products</li>
+          <li>Located in Mattannur, Kerala</li>
+          <li>Customer-first policy and easy returns</li>
+          <li>Fast and secure checkout experience</li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+     <!-- Contact -->
+<div class="section-box">
+  <h2 class="section-title">Contact Us</h2>
+  <p class="text-center mb-4">If you have any questions, feel free to reach out. We're here to help!</p>
+
+  <div class="row">
+    <div class="col-md-6 contact-info">
+      <h4>Our Information</h4>
+      <ul>
+        <li><i class="fa fa-map-marker"></i> Apz Store HQ, Mattannur, Kerala</li>
+        <li><i class="fa fa-phone"></i> +91 98765 43210</li>
+        <li><i class="fa fa-envelope"></i> support@apzstore.com</li>
+      </ul>
+      
+      <!-- Google Maps Embed API -->
+      <div class="map-container">
+
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15618.196676708892!2d75.35987846302376!3d11.866798162893884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba422b9b2aca753%3A0x380605a11ce24f6c!2sKannur%2C%20Kerala!5e0!3m2!1sen!2sin!4v1747204342091!5m2!1sen!2sin" 
+          width="100%" 
+          height="300" 
+          frameborder="0" 
+          style="border:0;" 
+          allowfullscreen="">
+        </iframe>
+      </div>
+    </div>
+
+    <div class="col-md-6 contact-form">
+      <h4>Send us a message</h4>
+      <form action="/contact" method="POST">
+        <div class="form-group">
+          <label for="name">Your Name *</label>
+          <input type="text" class="form-control" id="name" name="name" required/>
+        </div>
+        <div class="form-group">
+          <label for="email">Your Email *</label>
+          <input type="email" class="form-control" id="email" name="email" required/>
+        </div>
+        <div class="form-group">
+          <label for="message">Your Message *</label>
+          <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+      </div>
+
+    </div>
+  </div>
+<%- include('partials/footer') %>
+  <!-- JS -->
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

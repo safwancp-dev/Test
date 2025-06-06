@@ -1,4 +1,4 @@
 module.exports = {
   folder: 'Products',
-  allowedFormats: ['jpg', 'png', 'jpeg']
+  allowedFormats: 'auto'
 };

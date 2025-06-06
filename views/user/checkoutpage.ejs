@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+  <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link type="text/css" rel="stylesheet" href="/css/style.css" />
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f4f6f8;
+    }
+    .section { padding: 40px 0; }
+    h1.mb-4 { font-size: 2.7rem; font-weight: 700; color: #343a40; margin-bottom: 2.5rem; text-align: center; }
+    #header { background-color: #0b0d17; padding: 15px 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+    #header .header-logo a { font-size: 30px; color: #fff; font-weight: 700; text-decoration: none; }
+    .form-control, .form-select {
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      padding: 0.9rem 1.1rem;
+      font-size: 1.05rem;
+      width: 100%;
+    }
+    .form-group { margin-bottom: 1.75rem; }
+    .btn-danger {
+      background-color: #dc3545;
+      border: none;
+      color: white;
+      font-size: 1.1rem;
+      padding: 0.85rem 1.7rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+    }
+    .btn-danger:hover { background-color: #c82333; transform: translateY(-1px); }
+    .order-summary {
+      background-color: #ffffff;
+      border-radius: 0.75rem;
+      padding: 30px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+      width: 100%;
+    }
+    .order-summary h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: #333;
+    }
+    .order-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e4e4e4;
+      padding-bottom: 1.5rem;
+    }
+    .order-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .order-item img {
+      width: 130px;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 0.75rem;
+      margin-right: 1.2rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+    .order-item-details { flex-grow: 1; }
+    .order-item-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #212529;
+      margin-bottom: 0.4rem;
+    }
+    .order-item-qty {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 0.3rem;
+    }
+    .order-item-price {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #000;
+    }
+    .summary-total {
+      text-align: right;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #D10024;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div id="header">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <div class="header-logo">
+              <a href="/" class="logo">Apz Store</a>
+            </div>
+          </div>
+          <div class="col-md-9"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="section">
+    <div class="container">
+      <h1 class="mb-4">Checkout</h1>
+      <div class="row">
+        <div class="col-md-8">
+          <form action="/place-order" method="POST">
+            <div class="billing-info mb-4">
+              <h3>Billing & Shipping Information</h3>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Enter your full name" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Saved Address Dropdown -->
+              <div class="form-group">
+                <label for="savedAddress">Choose Saved Address</label>
+                <select name="savedAddress" id="savedAddress" class="form-control">
+                  <option value="">-- Select a saved address --</option>
+                  <% addresses.forEach((address) => { %>
+                    <option
+                      value="<%= address._id %>"
+                      data-fullname="<%= address.fullName %>"
+                      data-address="<%= address.address %>"
+                      data-city="<%= address.city %>"
+                      data-postal="<%= address.postalCode %>"
+                      data-phone="<%= address.phone %>"
+                    >
+                      <%= address.address %>, <%= address.city %> - <%= address.postalCode %>
+                    </option>
+                  <% }) %>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="address">Shipping Address</label>
+                <textarea id="address" name="addressId[address]" class="form-control" rows="3" placeholder="Enter your shipping address" required></textarea>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="addressId[city]" class="form-control" placeholder="Enter your city" required />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="postalCode">Postal Code</label>
+                    <input type="text" id="postalCode" name="addressId[postalCode]" class="form-control" placeholder="Enter postal code" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="addressId[phone]" class="form-control" placeholder="Enter your phone number" required />
+              </div>
+            </div>
+
+            <div class="payment-info mb-4">
+              <h3>Payment Method</h3>
+              <div class="form-group">
+                <label for="paymentMethod">Select Payment Method</label>
+                <select id="paymentMethod" name="paymentMethod" class="form-select" required>
+                  <option value="">Select a Payment Method</option>
+                  <option value="COD">Cash on Delivery</option>
+                  <option value="Online">Online Payment</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="couponCode">Coupon Code</label>
+              <input type="text" id="couponCode" name="couponCode" class="form-control" placeholder="Enter coupon code (if any)" />
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-danger btn-lg btn-block">Place Order</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-md-4">
+          <div class="order-summary">
+            <h3>Order Summary</h3>
+            <% if (cartItems && cartItems.length > 0) { %>
+              <% cartItems.forEach(item => { %>
+                <div class="order-item">
+                  <% if (item.product && item.product.image && item.product.image.length > 0) { %>
+                    <img src="<%= item.product.image[0] %>" alt="<%= item.product.name %>">
+                  <% } else { %>
+                    <div style="width: 130px; height: 130px; background-color: #eee; display: flex; justify-content: center; align-items: center; border-radius: 10px; margin-right: 15px;">
+                      <span style="color: #777; font-size: 0.8rem;">No Image</span>
+                    </div>
+                  <% } %>
+                  <div class="order-item-details">
+                    <div class="order-item-name"><%= item.product.name %></div>
+                    <div class="order-item-qty">Quantity: <strong><%= item.quantity %></strong></div>
+                    <div class="order-item-price">₹<%= (item.product.price * item.quantity).toFixed(2) %></div>
+                  </div>
+                </div>
+              <% }); %>
+              <div class="summary-total">
+                Total: ₹<%= totalAmount.toFixed(2) %>
+              </div>
+            <% } else { %>
+              <p>Your cart is empty.</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery and Bootstrap JS -->
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+
+  <!-- Address Autofill Script -->
+  <script>
+    $(document).ready(function () {
+      $('#savedAddress').on('change', function () {
+        const selected = $(this).find(':selected');
+        $('#fullName').val(selected.data('fullname') || '');
+        $('#address').val(selected.data('address') || '');
+        $('#city').val(selected.data('city') || '');
+        $('#postalCode').val(selected.data('postal') || '');
+        $('#phone').val(selected.data('phone') || '');
+      });
+    });
+  </script>
+</body>
+</html>

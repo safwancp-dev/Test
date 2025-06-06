@@ -21,82 +21,129 @@
     <!-- Font Awesome Icon -->
     <link rel="stylesheet" href="/css/font-awesome.min.css" />
 
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
     <!-- Custom stylesheet -->
     <link type="text/css" rel="stylesheet" href="/css/style.css" />
   </head>
 
   <body>
     <!-- HEADER -->
-    <%-include('partials/header') %>
+    <%- include('partials/header') %>
     <!-- /HEADER -->
 
     <!-- NAVIGATION BAR -->
-	<%- include("partials/navbar") %>
+    <%- include("partials/navbar") %>
     <!-- /NAVIGATION -->
 
-    <!-- SHOP PAGE SECTION -->
-   
     <!-- SHOP PAGE SECTION -->
     <div class="section">
       <div class="container">
         <div class="row">
           <div class="col-md-12">
+             <form id="filterForm" method="GET" action="/shop" class="form mx-3">
+              <div class="form-group flex">
+                <label for="category" class="">Category:</label>
+                <select
+                  name="category"
+                  id="category"
+                  class="form-control"
+                  onchange="document.getElementById('filterForm').submit()"
+                >
+                  <option value="">All Categories</option>
+                  <% categories.forEach(cat => { %>
+                    <option value="<%= cat._id %>" <%= selectedCategory === cat._id.toString() ? "selected" : "" %>>
+                      <%= cat.name %>
+                    </option>
+                  <% }) %>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="sort" class="mr-2">Sort By Price:</label>
+                <select
+                  name="sort"
+                  id="sort"
+                  class="form-control"
+                  onchange="document.getElementById('filterForm').submit()"
+                >
+                  <option value="">Sort By</option>
+                  <option value="asc" <%= selectedSort === "asc" ? "selected" : "" %>>Low to High</option>
+                  <option value="desc" <%= selectedSort === "desc" ? "selected" : "" %>>High to Low</option>
+                </select>
+              </div>
+            </form>
+
             <h1>Shop Products</h1>
+
             <div class="row">
               <% products.forEach(product => { %>
                 <div class="col-md-3 col-xs-6">
-                  <div class="product-card">
-                    <div class="product-image">
-                      <img src="<%= product.image %>" alt="<%= product.name %>" />
+                  <div
+                    class="product-card"
+                    style="display: flex; flex-direction: column; align-items: center; border: 1px solid #ddd; padding: 10px; margin-bottom: 20px;"
+                  >
+                    <!-- Clickable Product Image -->
+                    <a
+                      href="/product/<%= product._id %>"
+                      style="width: 200px; height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;"
+                    >
+                      <img
+                        src="<%= product.image[0] %>"
+                        alt="<%= product.name %>"
+                        style="width: 100%; height: 100%; object-fit: cover;"
+                      />
 
-                      <!-- Wishlist Button (Add or Remove) -->
+                      <!-- Wishlist Button (AJAX Toggle) -->
                       <% if (user) { %>
-                        <form method="POST" style="display:inline;">
+                        <button
+                          class="wishlist-btn wishlist-btn-ajax"
+                          data-product="<%= product._id %>"
+                          style="background: transparent; border: none; position: absolute; top: 10px; right: 10px;"
+                          title="Toggle wishlist"
+                        >
                           <% if (wishlistItems.includes(product._id.toString())) { %>
-                            <!-- Remove from wishlist -->
-                            <button 
-                              type="submit" 
-                              formaction="/wishlist/remove/<%= product._id %>" 
-                              class="wishlist-btn" 
-                              title="Remove from wishlist">
-                              <i class="fa fa-heart" style="color: red;"></i>
-                            </button>
+                            <i class="fa fa-heart" style="color: red;"></i>
                           <% } else { %>
-                            <!-- Add to wishlist -->
-                            <button 
-                              type="submit" 
-                              formaction="/wishlist/add/<%= product._id %>" 
-                              class="wishlist-btn" 
-                              title="Add to wishlist">
-                              <i class="fa fa-heart-o"></i>
-                            </button>
+                            <i class="fa fa-heart-o"></i>
                           <% } %>
-                        </form>
+                        </button>
                       <% } else { %>
-                        <!-- Not logged in: Redirect to login -->
-                        <a href="/login" class="wishlist-btn" title="Login to add to wishlist">
+                        <a
+                          href="/login"
+                          class="wishlist-btn"
+                          title="Login to add to wishlist"
+                          style="position: absolute; top: 10px; right: 10px;"
+                        >
                           <i class="fa fa-heart-o"></i>
                         </a>
                       <% } %>
-                    </div>
+                    </a>
 
-                    <div class="product-info">
-                      <h2><%= product.name %></h2>
+                    <!-- Product Info -->
+                    <div class="product-info" style="text-align: center; margin-top: 10px;">
+                      <h2 style="font-size: 18px;"><%= product.name %></h2>
                       <p>Price: $<%= product.price %></p>
                       <p>Category: <%= product.category.name %></p>
-                      <p><%= product.description %></p>
+                      <p style="font-size: 14px;"><%= product.description %></p>
                     </div>
 
-                    <div class="add-to-cart">
-                      <form action="/add-to-cart/<%= product._id %>" method="POST">
-                        <button type="submit" class="add-to-cart-btn">
+                    <!-- Add to Cart AJAX button -->
+                    <div class="add-to-cart" style="width: 100%; margin-top: 10px;">
+                      <% if (user) { %>
+                        <button
+                          class="add-to-cart-btn btn btn-success btn-sm"
+                          data-product="<%= product._id %>"
+                          style="width: 100%;"
+                        >
                           <i class="fa fa-shopping-cart"></i> Add to cart
                         </button>
-                      </form>
-                      <!-- View Button -->
-                  <a href="/product/<%= product._id %>" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 5px;">
-                    <i class="fa fa-eye"></i> View
-                  </a>
+                      <% } else { %>
+                        <a href="/login" class="add-to-cart-btn btn btn-success btn-sm" style="width: 100%;">
+                          <i class="fa fa-shopping-cart"></i> Add to Cart
+                        </a>
+                      <% } %>
                     </div>
                   </div>
                 </div>
@@ -106,29 +153,8 @@
         </div>
       </div>
     </div>
-    
-	  
-    <!-- FOOTER -->
-    <footer>
-      <div id="bottom-footer" class="section">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12 text-center">
-              <ul class="footer-payments">
-                <li><a href="#"><i class="fa fa-cc-visa"></i></a></li>
-                <li><a href="#"><i class="fa fa-credit-card"></i></a></li>
-                <li><a href="#"><i class="fa fa-cc-paypal"></i></a></li>
-                <li><a href="#"><i class="fa fa-cc-mastercard"></i></a></li>
-              </ul>
-              <span class="copyright">
-                &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-    <!-- /FOOTER -->
+
+    <%- include('partials/footer') %>
 
     <!-- JS Scripts -->
     <script src="/js/jquery.min.js"></script>
@@ -137,5 +163,101 @@
     <script src="/js/nouislider.min.js"></script>
     <script src="/js/jquery.zoom.min.js"></script>
     <script src="/js/main.js"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+      document.addEventListener('DOMContentLoaded', () => {
+        toastr.options = {
+          closeButton: false,
+          debug: false,
+          newestOnTop: false,
+          progressBar: true,
+          positionClass: "toast-top-right",
+          preventDuplicates: false,
+          onclick: null,
+          showDuration: "300",
+          hideDuration: "1000",
+          timeOut: "4000",
+          extendedTimeOut: "1000",
+          showEasing: "swing",
+          hideEasing: "linear",
+          showMethod: "fadeIn",
+          hideMethod: "fadeOut"
+        };
+
+        const toggleWishlist = async (button) => {
+          const productId = button.dataset.product;
+          const icon = button.querySelector('i');
+          const isInWishlist = icon.classList.contains('fa-heart');
+          const url = isInWishlist ? `/wishlist/remove/${productId}` : `/wishlist/add/${productId}`;
+
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              icon.classList.toggle('fa-heart', !isInWishlist);
+              icon.classList.toggle('fa-heart-o', isInWishlist);
+              icon.style.color = !isInWishlist ? 'red' : '';
+              toastr[!isInWishlist ? 'success' : 'info'](`${!isInWishlist ? 'Added to' : 'Removed from'} wishlist`);
+            } else {
+              toastr.warning(result.message || 'Wishlist update failed');
+            }
+          } catch (err) {
+            console.error('Wishlist toggle error:', err);
+            toastr.error('Error updating wishlist');
+          }
+        };
+
+        const addToCart = async (button) => {
+          const productId = button.dataset.product;
+
+          try {
+            const response = await fetch(`/add-to-cart/${productId}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              toastr.success('Added to cart!');
+              button.disabled = true;
+              button.innerHTML = '<i class="fa fa-check"></i> Added';
+            } else {
+              toastr.warning(result.message || 'Could not add to cart');
+            }
+          } catch (err) {
+            console.error('Add to cart error:', err);
+            toastr.error('Error adding to cart');
+          }
+        };
+
+        // Attach event listeners only to wishlist buttons that are real buttons (avoid links)
+        document.querySelectorAll('.wishlist-btn-ajax').forEach(button => {
+          button.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleWishlist(button);
+          });
+        });
+
+        // Attach event listeners only to add-to-cart real buttons (exclude <a>)
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+          if (button.tagName.toLowerCase() === 'button') {
+            button.addEventListener('click', (e) => {
+              e.preventDefault();
+              addToCart(button);
+            });
+          }
+        });
+      });
+    </script>
+
   </body>
 </html>

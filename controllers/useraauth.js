@@ -1,11 +1,10 @@
 const User = require('../model/userSchema');
 
-
-
-
+const Banner=require('../model/bannerSchema')
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken');
 const { renderusermanagement } = require('./adminauth');
+const Coupon=require('../model/couponSchema')
 
 require('dotenv').config()
 const crypto=require('crypto')
@@ -21,15 +20,42 @@ const transporter = nodemailer.createTransport({
   });
   
 
-const renderhomepage=(req, res) => {
-    res.render('user/home',{user:req.user});
+const fetchValidCoupons=async(req,res)=>{
+    try{
+        const coupons=await Coupon.find({
+            expiryDate:{$gte:new Date()}
+        })
+        res.render('user/offers',{coupons,user:req.user||null})
+    }catch(err){
+        res.status(400).send('failed to load coupons')
+    }
+}
+
+
+
+const renderhomepage=async(req, res) => {
+   try{
+    const banners=await Banner.find()
+      // Optional: log to verify
+    console.log("Fetched banners:", banners);
+    res.render('user/home',{user:req.user ||null,banners});
+   }catch(err){
+    console.log('error loading home page')
+    res.status(400).send('error loading home page')
+   }
+       
+    
 }
 
 const renderaboutpage=(req,res)=>{
-
+     
+      
+       
     res.render('user/about',{ user:req.user})
 }
-
+const rendercontactus=(req,res)=>{
+    res.render('user/contactus',{user:req.user})
+}
 const renderloginpage=(req,res)=>{
     res.render('user/login',{msg: null,successMsg:null} )
 }
@@ -90,7 +116,7 @@ const signup=async(req,res)=>{
           } catch (emailError) {
             console.log('❌ Failed to send email:', emailError);
           }
-          const token = jwt.sign({ userid: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+          const token = jwt.sign({ userid: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
           // Send the JWT token as a cookie or in the response body
           res.cookie('token', token, { httpOnly: true }); 
@@ -108,6 +134,7 @@ const verifyOtp=async(req,res)=>{
 
     
         const{userId,otp}=req.body;
+        const banners=await Banner.find()
         const user=await User.findById(userId)
         if(!user){
             return res.render("user/verifyOtp",{
@@ -136,7 +163,8 @@ const verifyOtp=async(req,res)=>{
     user.otp=null;
     user.otpExpiry=null;
     await user.save()
-    res.render('user/home',{user, msg:'signup successfull'})
+
+    res.render('user/home',{user, banners,msg:'signup successfull'})
 }
     catch(err){
         console.log('error in otp verification',err)
@@ -151,7 +179,7 @@ const verifyOtp=async(req,res)=>{
 const login=async(req,res)=>{
     try{
         const{email,password}=req.body
-
+        const banners=await Banner.find()
         const user=await User.findOne({email})
         if(!user){
            return res.render('user/login',{msg:"invalid credantails",successMsg:null})
@@ -164,7 +192,7 @@ const login=async(req,res)=>{
              return res.render('user/login',{msg: "Email or password invalid", successMsg: null})
         }
         const token=jwt.sign({userid:user._id,email:user.email},process.env.JWT_SECRET,
-            {expiresIn:'1h'})//token expires in 1 hour
+            {expiresIn:'7d'})//token expires in 1 hour
             console.log(token)
 
             if(!token){
@@ -174,7 +202,7 @@ const login=async(req,res)=>{
 
 
             console.log("login succesfull")
-            res.render('user/home', { user,msg:null,successMsg:'login successfull'}); 
+            res.redirect('/home')
 
     }catch(err){
         res.status(500).send("error during login")
@@ -196,7 +224,9 @@ const renderforgotpassword=(req,res)=>{
 
 const handleforgotpassword=async(req,res)=>{
     try{
+
     const {email}=req.body;
+    const banners=await Banner.find()
     const user =await User.findOne({email})
     if(!user){
         return res.render('user/forgotpassword',{msg:'no user found with this email'})
@@ -216,7 +246,7 @@ const handleforgotpassword=async(req,res)=>{
         subject: 'Reset Password OTP',
         text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
       });
-      res.render('user/resetpassword',{email,msg:null})
+      res.render('user/resetpassword',{email,banners,msg:null})
     }catch(err){
         console.log("error in forgot password",err)
         res.render('user/forgotpassword',{msg:"something went wrong"})
@@ -258,19 +288,10 @@ const handleresetpassword=async(req,res)=>{
 }
 const getuserAccount=async(req,res)=>{
     try{
-        const token=req.cookies.token;
-        if(!token){
-            return res.redirect('/login')
-        }
-
-        const decoded=jwt.verify(token,process.env.JWT_SECRET)
-        const userId=decoded.userid;
-
+        const userId=req.user.userid
         const user=await User.findById(userId)
-        if(!user){
-            return res.redirect('/login')
-        }
-        res.render('user/myaccount', { user, message: req.query.message });
+        if(!user)return res.redirect('/login')
+        res.render('user/my-account', { user,addresses:user.addresses||[], message: req.query.message||null });
 
 
     }catch(err){
@@ -281,30 +302,51 @@ const getuserAccount=async(req,res)=>{
 
     }
 }
-const updateUser=async (req,res)=>{
+const editProfile=async(req,res)=>{
     try{
-    const token=req.cookies.token;
-    if(!token){
-        return res.redirect('/login')
+        const userId=req.user.userid
+        const{name,email}=req.body
+        
+       const updateUser = await User.findByIdAndUpdate(userId,{name,email},{new:true})
+        if (!updateUser ) {
+      return res.status(404).send("User not found.");
     }
-
-    const decoded=jwt.verify(token,process.env.JWT_SECRET)
-    const userId=decoded.userid;
-
-    const {name,email, address}=req.body;
-    const updateUser=await User.findByIdAndUpdate(
-        userId,
-        {name,email, address},
-        {new:true}
-    )
-   return res.render('user/home', { user:updateUser, msg: req.query.message  });
-
-    }
-    catch(err){
-        console.log('error in user updating',err)
-        res.clearCookie('token')
-        res.redirect('/login')
+        res.redirect('/my-account')
+    }catch(err){
+        console.error('error updating profile',err)
+        res.status(400).send('error updating profile',err)
     }
 }
-  
-module.exports={renderhomepage,renderaboutpage,renderloginpage,rendersignuppage,login,signup,logout,verifyOtp,renderotppage,renderforgotpassword,handleforgotpassword,renderresetpassword,handleresetpassword,getuserAccount,updateUser}
+const addAddress=async(req,res)=>{
+    try{
+        const userId=req.user.userid
+        const {fullName,address,city,postalCode,phone}=req.body
+        await User.findByIdAndUpdate(userId,{
+            $push:{
+                addresses:{fullName,address,city,postalCode,phone},
+            },
+        })
+        res.redirect('/my-account')
+    }catch(err){
+    console.error('error adding address',err)
+    res.redirect('/myaccount?message=failed to add address')
+    }
+}
+
+const deleteAddress=async(req,res)=>{
+    try{
+        const userId=req.user.userid
+        const {addressId}=req.body
+        await User.findByIdAndUpdate(userId,{
+            $pull:{
+                addresses:{_id:addressId}
+            }
+        })
+        res.redirect('/my-account?message=Address deleted successfully')
+    }catch(err){
+        console.log('error deleting address',err)
+        res.redirect('/my-account?message=failed deleting address')
+    }
+}
+
+module.exports={renderhomepage,renderaboutpage,rendercontactus,renderloginpage,rendersignuppage,login,signup,logout,verifyOtp,renderotppage,renderforgotpassword,handleforgotpassword,renderresetpassword,handleresetpassword,getuserAccount,editProfile,addAddress,deleteAddress,fetchValidCoupons}

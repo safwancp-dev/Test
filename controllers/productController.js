@@ -1,7 +1,9 @@
 const Category=require('../model/categorySchema')
 const jwt=require('jsonwebtoken');
 const Product=require('../model/productSchema')
-const Wishlist=require('../model/wishlistSchema')
+const Wishlist=require('../model/wishlistSchema');
+const Review=require('../model/reviews')
+const Order=require('../model/orderSchema')
 const createCategory=async(req,res)=>{
     try{
         console.log('Rendering addcategory page');
@@ -42,10 +44,10 @@ const getAddProduct=async(req,res)=>{
 const addProduct = async (req, res) => {
     try {
 
-        console.log('error')
+        
     
       const { name, description, price, category,color } = req.body;
-      const imageUrl = req.file.path; // Cloudinary returns `path`
+       const imageUrl = req.files.map(file => file.path);// Cloudinary returns `path`
   
   
       const newProduct = new Product({
@@ -62,8 +64,8 @@ const addProduct = async (req, res) => {
   
       res.redirect('/admin/productManagement');
     } catch (err) {
-      console.error('Error adding product:', err);
-      res.status(500).send('Error creating product');
+      console.error('Error adding product:', (JSON.stringify(err)));
+        res.status(500).send(JSON.stringify(err));
     }
   };
   
@@ -91,6 +93,9 @@ const geteditproduct=async(req,res)=>{
     try{
         const productId=req.params.id;
        const product= await Product.findById(productId)
+       if (!product) {
+      return res.status(404).send('Product not found');
+    }
         const categories=await Category.find()
         res.render('admin/editproduct',{product,categories})
     }catch(err){
@@ -103,7 +108,8 @@ const geteditproduct=async(req,res)=>{
 
 const updateproduct=async(req,res)=>{
     try{
-        const produtId=req.params.id;
+        const productId = req.params.id;
+
         const{name,description,price,category,color}=req.body;
 const updateData={
     name,
@@ -112,11 +118,11 @@ const updateData={
     category,
     color
 }
-if(req.file){
-    updateData.image=req.file.path;
-}
+if (req.files && req.files.length > 0) {
+      updateData.image = req.files.map(file => file.path); //update images if new files uploaded
+    }
 
-await Product.findByIdAndUpdate(produtId,updateData)
+await Product.findByIdAndUpdate(productId,updateData)
   res.redirect('/admin/productManagement')
     }catch(err){
         console.log('error product update',err)
@@ -142,7 +148,22 @@ const deleteproduct=async(req,res)=>{
 
 const getShopProducts=async(req,res)=>{
     try{
-        const products=await Product.find().populate('category')
+        const {sort,category}=req.query;
+        // Build filter
+        let filter={}
+        if(category){
+            filter.category=category
+        }
+         // Build sort option
+         let sortOption={}
+         if(sort==='asc'){
+            sortOption.price=1
+         }else if(sort==='desc'){
+            sortOption.price=-1
+         }
+        const products=await Product.find(filter).populate('category').sort(sortOption)
+         // Fetch categories for filters
+         const categories=await Category.find()
         
         // Initialize wishlistItems as an empty array
        let wishlistItems=[]
@@ -153,7 +174,7 @@ const getShopProducts=async(req,res)=>{
                 wishlistItems=wishlist.products.map(product=>product._id.toString())
             }
         }
-        res.render('user/shop',{products,user:req.user,wishlistItems})
+        res.render('user/shop',{products,user:req.user,wishlistItems,categories,selectedCategory:category||'',selectedSort:sort||''})
     }catch(err){
         console.log('error loading shop products',err)
         res.status(500).send('error laoding shop page')
@@ -162,16 +183,18 @@ const getShopProducts=async(req,res)=>{
 
 const viewProductdetails=async(req,res)=>{
     try{
+    
         const productId=req.params.id
-        const product=await Product.findById(productId).populate('category')
+        const product=await Product.findById(productId).populate('category').populate('reviews.Review')
+
         if(!product){
             return res.status(400).send('product not found')
         }
         let wishlistItems=[]
         if(req.user){
             const wishlist=await Wishlist.findOne({user:req.user.userid}).populate('products')
-            if(!wishlist){
-                wishlistItems=wishlist.products.map(product=>product>_id.toString())
+            if(wishlist){
+                wishlistItems=wishlist.products.map(product=> product._id.toString())
             }
         }
 
@@ -182,4 +205,64 @@ const viewProductdetails=async(req,res)=>{
     }
 }
 
-module.exports={createCategory,addCategory,getAddProduct,addProduct ,getproducts,deleteproduct,geteditproduct,updateproduct,getShopProducts,viewProductdetails}
+
+const getSearchShopItems=async(req,res)=>{
+    const {search}=req.body
+    try{
+       const products= await Product.find({name:{$regex:search,$options:"i"}});
+        const categories=await Category.find()
+        let wishlistItems=[]
+        // If user is logged in, fetch the wishlist
+        if(req.user){
+            const wishlist=await Wishlist.findOne({user:req.user.userid}).populate('products')
+            if(wishlist){
+                wishlistItems=wishlist.products.map(product=>product._id.toString())
+            }
+        }
+        res.render('user/shop',{products,user:req.user,wishlistItems,categories,selectedCategory:'',selectedSort:''})
+
+    }catch(err){
+        console.log("Search error:", err);
+        res.status(500).send("Error searching products");
+
+    }
+}
+
+const createReview=async(req,res)=>{
+    try{
+        const productId=req.params.id
+        const{rating,comment}=req.body
+        const userId=req.user._id || req.user.id || req.user.userid;
+
+        const hasPurchased=await Order.exists({
+            user:userId,
+            'items.product':productId,// assuming items is an array in the order
+            status:'delivered'
+        })
+
+        if(!hasPurchased){
+            return res.status(403).json({message:'you can only review products you have purchased'})
+        }
+        //check if user has already reviewed
+        const existingReview=await Review.findOne({user:userId,product:productId})
+        if(existingReview){
+            return res.status(400).json({message:"you have already reviewd this product"})
+        }
+        //Create the review
+        const review=new Review({
+            user:userId,
+            product:productId,
+            rating,
+            comment
+        })
+        await review.save()
+        await Product.findByIdAndUpdate(productId,{
+            $push:{reviews:review._id}
+        })
+        res.status(200).redirect('viewproduct')
+    }catch(err){
+        console.error(err)
+        res.status(500).json({message:'server error'})
+    }
+}
+module.exports={createCategory,addCategory,getAddProduct,addProduct ,getproducts,deleteproduct,geteditproduct,updateproduct,getShopProducts,viewProductdetails,getSearchShopItems,createReview}
